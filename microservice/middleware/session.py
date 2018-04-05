@@ -1,20 +1,19 @@
 import logging
-import sys
 from concurrent.futures import CancelledError
 
 import peewee
 import psycopg2
-from middleware.functions import location
 from peewee import InterfaceError
 from psycopg2.extensions import QueryCanceledError
 
 from exceptions import ApiError, InternalError, AccessDenied, ReactMessage
 from managers.session import SessionManager
 from managers.user import UserManager
+from middleware.functions import location
 from middleware.user import BaseUser
 
 
-def check(anonymous=False, roles=None):
+def check(anonymous=True, roles=None):
     """
     Обертка для использования параметров авторизации
     :param anonymous: разрешить досутп анонимусам (для получения инфы, если юзер залогинен)
@@ -53,9 +52,6 @@ def check(anonymous=False, roles=None):
                         self.compose(error="#api_error {}".format(e))
                     except AccessDenied as e:
                         self.compose(error="#access_denied {}".format(e), status=401)
-                    except TeacherError:
-                        me.capture_exception()
-                        self.send_error(500, exc_info=sys.exc_info())
                     except ReactMessage as e:
                         self.compose(error="#message {}".format(e))
                     except (QueryCanceledError, CancelledError) as e:

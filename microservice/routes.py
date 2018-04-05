@@ -1,42 +1,41 @@
-from handlers import v1
 from handlers.handler import BasicHandler
 from handlers.metrics import MetricsHandler
 
-min_version = 1  # минимальная поддерживаемая версия
-latest = 1  # latest actual api version
 
-handlers = [
-    # формат: (endpoint, {version: handler})
+class Router:
+    def __init__(self, handlers):
+        """
+        формат handlers: (endpoint str, {version int: handler handler})
+        """
+        self.handlers = handlers
+        self.min_version = 1  # минимальная поддерживаемая версия
+        self.latest = 1  # latest actual api version
+        self._routes = []
 
-]
-
-
-def gen_url(v, endpoint, handler):
-    min_v = sorted(handler.keys())[0]
-    if v in handler:
-        choosen_handler = handler[v]
-        choosen_handler.version = v
-    else:
-        if v > min_v:
-            choosen_handler = gen_url(v-1, endpoint, handler)[1]
+    def gen_url(self, v, endpoint, handler):
+        min_v = sorted(handler.keys())[0]
+        if v in handler:
+            choosen_handler = handler[v]
+            choosen_handler.version = v
         else:
-            return None
+            if v > min_v:
+                choosen_handler = self.gen_url(v-1, endpoint, handler)[1]
+            else:
+                return None
 
-    return '/v{}/{}'.format(v, endpoint), choosen_handler
+        return '/v{}/{}'.format(v, endpoint), choosen_handler
 
+    @property
+    def routes(self):
+        for endpoint, handler in self.handlers:
+            for v in range(self.min_version, self.latest+1):
+                route = self.gen_url(v, endpoint, handler)
+                if route:
+                    self._routes.append(route)
 
-routes = []
-
-
-for endpoint, handler in handlers:
-    for v in range(min_version, latest+1):
-        route = gen_url(v, endpoint, handler)
-        if route:
-            routes.append(route)
-
-
-#  Служебные эндпоинты
-routes.extend([
-    ("/metrics", MetricsHandler),
-    (".*", BasicHandler),
-])
+        #  Служебные эндпоинты
+        self._routes.extend([
+            ("/metrics", MetricsHandler),
+            (".*", BasicHandler),
+        ])
+        return self._routes
