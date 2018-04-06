@@ -5,7 +5,11 @@ from os import urandom
 from peewee import DoesNotExist
 from ua_parser import user_agent_parser
 
-from microservice import cfg
+try:
+    import cfg
+except ImportError:
+    from microservice import cfg
+
 from microservice.managers.manager import DataManager
 from microservice.models import Session
 

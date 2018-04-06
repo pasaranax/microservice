@@ -2,7 +2,11 @@ from datetime import datetime
 from hashlib import sha1
 from os import urandom
 
-from microservice import cfg
+try:
+    import cfg
+except ImportError:
+    from microservice import cfg
+
 from peewee import DoesNotExist, IntegrityError
 
 from microservice.exceptions import InternalError

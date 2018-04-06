@@ -16,7 +16,11 @@ from tornado.escape import json_decode
 from tornado.netutil import is_valid_ip
 from tornado.web import RequestHandler
 
-from microservice import cfg
+try:
+    import cfg
+except ImportError:
+    from microservice import cfg
+
 from microservice.exceptions import ApiError
 from microservice.managers.handlerstat import HandlerStatManager
 from microservice.metrics import Metrics

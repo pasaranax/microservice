@@ -1,8 +1,13 @@
 import logging
+import traceback
 
 from raven.contrib.tornado import AsyncSentryClient
 
-from microservice import cfg
+try:
+    import cfg
+except ImportError:
+    from microservice import cfg
+
 from microservice.routes import Router
 
 logging.info("Server starting...")
@@ -35,5 +40,3 @@ class Server:
         except KeyboardInterrupt:
             self.loop.close()
             logging.info("Server stopped")
-        except Exception:
-            self.app.sentry_client.captureException()

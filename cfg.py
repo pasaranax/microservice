@@ -14,7 +14,7 @@ class db:
 
 class app:
     debug = bool(os.getenv("DEBUG", True))
-    port = 8001
+    port = 8002
     workdir = os.path.dirname(os.path.abspath(__file__))
     domain = "example.com"
     secret_key = "random string"
