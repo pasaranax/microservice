@@ -159,3 +159,18 @@ async def location(ip):
 async def gravatar(email):
     digest = md5(email.lower().encode("utf-8")).hexdigest()
     return "https://www.gravatar.com/avatar/{}?d=retro&s={}".format(digest, 500)
+
+
+class DummyAtomic:
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, *kwargs):
+        pass
+
+
+def check_atomic(obj):
+    if obj:
+        return obj.atomic()
+    else:
+        return DummyAtomic()

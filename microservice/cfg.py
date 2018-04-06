@@ -6,13 +6,12 @@ from logging.config import dictConfig
 try:
     from cfg import *
 except ImportError:
-    class db:
-        host = os.getenv("DB_HOST", "example.com")
-        port = os.getenv("DB_PORT", "5432")
-        user = os.getenv("DB_USER", "user")
-        password = os.getenv("DB_PASS", "password")
-        database = os.getenv("DB_NAME", "database")
-
+    # class db:
+    #     host = os.getenv("DB_HOST", "example.com")
+    #     port = os.getenv("DB_PORT", "5432")
+    #     user = os.getenv("DB_USER", "user")
+    #     password = os.getenv("DB_PASS", "password")
+    #     database = os.getenv("DB_NAME", "database")
 
     class app:
         debug = bool(os.getenv("DEBUG", True))

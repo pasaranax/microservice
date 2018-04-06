@@ -14,7 +14,7 @@ from logging.config import dictConfig
 
 class app:
     debug = bool(os.getenv("DEBUG", True))
-    port = 8002
+    port = 8001
     workdir = os.path.dirname(os.path.abspath(__file__))
     domain = "example.com"
     secret_key = "random string"

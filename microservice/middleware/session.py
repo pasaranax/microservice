@@ -5,6 +5,7 @@ import peewee
 import psycopg2
 from psycopg2.extensions import QueryCanceledError
 
+from functions import check_atomic
 from microservice.exceptions import ApiError, InternalError, AccessDenied, ReactMessage
 from microservice.functions import location
 from microservice.middleware.user import BaseUser
@@ -30,9 +31,9 @@ def check(anonymous=True, roles=None):
             Выполняет метод, как атомик вызов обернутый в таск
             """
             async def task(self, *args, **kwargs):
-                async with self.application.objects.atomic():
+                async with check_atomic(self.application.objects):
                     try:
-                        me = await self.session.me()
+                        me = await self.session.me() if self.application.objects else None
                         if not (me or anonymous):
                             raise AccessDenied("#auth #token Token invalid")
                         elif roles and me["role"] not in roles:
