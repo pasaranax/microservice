@@ -1,7 +1,6 @@
 import logging
 from collections import UserDict
 
-from microservice.managers.user import UserManager
 
 
 class BaseUser(UserDict):
@@ -17,7 +16,9 @@ class BaseUser(UserDict):
 
         self.obj = obj
         self.user_dict = user_dict
-        self.user_manager = UserManager(obj)
+        if obj:
+            from microservice.managers.user import UserManager
+            self.user_manager = UserManager(obj)
 
     def __setitem__(self, key, value):
         self.data[key] = value
@@ -39,4 +40,3 @@ class BaseUser(UserDict):
         if hasattr(self, "sentry_client"):
             self.sentry_client.user_context(dict(self))
             self.sentry_client.captureException(extra=extra)
-

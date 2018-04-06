@@ -14,9 +14,5 @@ class AccessDenied(BaseException):
     pass
 
 
-class NotPossibleError(BaseException):
-    pass
-
-
 class ReactMessage(BaseException):
     pass

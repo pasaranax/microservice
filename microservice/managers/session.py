@@ -5,46 +5,41 @@ from os import urandom
 from peewee import DoesNotExist
 from ua_parser import user_agent_parser
 
-try:
-    import cfg
-except ImportError:
-    from microservice import cfg
-
+import cfg
 from microservice.managers.manager import DataManager
 from microservice.models import Session
 
 
 class SessionManager(DataManager):
     async def create(self, user, user_agent, network=None, push_token=None, ip=None, location=None):
-        async with self.obj.atomic():
-            ua_data = user_agent_parser.Parse(user_agent)
-            os = ua_data["os"]["family"]
-            client = ua_data["user_agent"]["family"]
-            rand = sha1(urandom(16)).hexdigest()
+        ua_data = user_agent_parser.Parse(user_agent)
+        os = ua_data["os"]["family"]
+        client = ua_data["user_agent"]["family"]
+        rand = sha1(urandom(16)).hexdigest()
 
-            session_obj, created = await self.obj.get_or_create(
-                Session,
-                user=user["id"],
-                user_agent=user_agent,
-                login_method=network,
-                push_token=push_token,
-                defaults=dict(
-                    os=os,
-                    client=client,
-                    rand=rand,
-                    token=self._generate_token(user["id"], os, client, rand),
-                    expire=datetime.now() + timedelta(days=cfg.app.session_lifetime),
-                    ip=ip,
-                    location=location
-                )
+        session_obj, created = await self.obj.get_or_create(
+            Session,
+            user=user["id"],
+            user_agent=user_agent,
+            login_method=network,
+            push_token=push_token,
+            defaults=dict(
+                os=os,
+                client=client,
+                rand=rand,
+                token=self._generate_token(user["id"], os, client, rand),
+                expire=datetime.now() + timedelta(days=cfg.app.session_lifetime),
+                ip=ip,
+                location=location
             )
-            session_obj.ip = ip
-            session_obj.location = location
-            session_obj.last_login = datetime.now()
-            await self.obj.update(session_obj)
-            session = session_obj.dict()
+        )
+        session_obj.ip = ip
+        session_obj.location = location
+        session_obj.last_login = datetime.now()
+        await self.obj.update(session_obj)
+        session = session_obj.dict()
 
-            return session
+        return session
         
     def read(self, token):
         try:
@@ -60,16 +55,15 @@ class SessionManager(DataManager):
         return session
     
     async def delete(self, token):
-        async with self.obj.atomic():
-            try:
-                if not token:
-                    raise DoesNotExist
-                session_obj = await self.obj.get(Session, token=token)
-                await self.obj.delete(session_obj)
-                session = None
-            except DoesNotExist:
-                session = None
-            return session
+        try:
+            if not token:
+                raise DoesNotExist
+            session_obj = await self.obj.get(Session, token=token)
+            await self.obj.delete(session_obj)
+            session = None
+        except DoesNotExist:
+            session = None
+        return session
 
     async def update(self, token, ip=None, location=None, push_token=None):
         session_obj = await self.obj.get(Session, token=token)

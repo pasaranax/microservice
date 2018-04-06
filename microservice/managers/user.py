@@ -2,17 +2,13 @@ from datetime import datetime
 from hashlib import sha1
 from os import urandom
 
-try:
-    import cfg
-except ImportError:
-    from microservice import cfg
-
 from peewee import DoesNotExist, IntegrityError
 
+import cfg
 from microservice.exceptions import InternalError
-from microservice.managers.manager import DataManager
 from microservice.functions import send_mail, extract_one, gravatar
-from microservice.models import User, connection
+from microservice.managers.manager import DataManager
+from microservice.models import User
 
 
 class UserManager(DataManager):
@@ -56,29 +52,28 @@ class UserManager(DataManager):
         user = user_obj.dict()
         return user, created
 
-    def read(self, user_id=None, login=None, password=None, email=None, network=None):
-        with connection.atomic():
-            try:
-                if user_id:
-                    user_obj = User.get(id=user_id)
-                    user = user_obj.dict(recurse=False)
-                elif login and password:
-                    user_obj = User.get(login=login)
-                    if user_obj.password_hash != self.hash(password):
-                        user = None
-                    else:
-                        user = user_obj.dict(recurse=False)
-                elif login and network:
-                    user_obj = User.get(login=login)
-                    user = user_obj.dict(recurse=False)
-                elif email:
-                    user_obj = User.get(email=email)
-                    user = user_obj.dict(recurse=False)
-                else:
+    async def read(self, user_id=None, login=None, password=None, email=None, network=None):
+        try:
+            if user_id:
+                user_obj = User.get(id=user_id)
+                user = user_obj.dict(recurse=False)
+            elif login and password:
+                user_obj = User.get(login=login)
+                if user_obj.password_hash != self.hash(password):
                     user = None
-            except DoesNotExist:
+                else:
+                    user = user_obj.dict(recurse=False)
+            elif login and network:
+                user_obj = User.get(login=login)
+                user = user_obj.dict(recurse=False)
+            elif email:
+                user_obj = User.get(email=email)
+                user = user_obj.dict(recurse=False)
+            else:
                 user = None
-            return user
+        except DoesNotExist:
+            user = None
+        return user
 
     async def me(self, token=None, user_id=None):
         me_obj = await self.obj.execute(User.raw("""
@@ -93,7 +88,6 @@ class UserManager(DataManager):
     async def update(self, user_data):
         user_obj = await self.obj.get(User, id=user_data["id"])
         user = user_obj.dict()
-        error = None
         protected_fields = ["email", "phone", "new_password"]
         need_password = False
         for field in protected_fields:
@@ -105,8 +99,6 @@ class UserManager(DataManager):
                 if user_data.get("new_password"):
                     user_data["password_hash"] = self.hash(user_data["new_password"])
             else:
-                # for f in protected_fields:
-                #     if user_data.get(f):
                 user = None
 
         # изменение данных
@@ -125,22 +117,21 @@ class UserManager(DataManager):
         Сгенерировать код для восстановления пароля
         :param email: емейл юзера
         """
-        async with self.obj.atomic():
-            try:
-                user_obj = await self.obj.get(User, email=email)
-            except DoesNotExist:
-                user = None
-            else:
-                user_obj.code = sha1(urandom(16)).hexdigest()
-                user_obj.status = "recovery"
-                await self.obj.update(user_obj)
-                await send_mail(
-                    email,
-                    cfg.app.recovery_text.format(user_obj.code),
-                    cfg.app.recovery_subject
-                )
-                user = user_obj.dict()
-            return user
+        try:
+            user_obj = await self.obj.get(User, email=email)
+        except DoesNotExist:
+            user = None
+        else:
+            user_obj.code = sha1(urandom(16)).hexdigest()
+            user_obj.status = "recovery"
+            await self.obj.update(user_obj)
+            await send_mail(
+                email,
+                cfg.app.recovery_text.format(user_obj.code),
+                cfg.app.recovery_subject
+            )
+            user = user_obj.dict()
+        return user
 
     async def confirm(self, code, password=None):
         """
@@ -148,19 +139,18 @@ class UserManager(DataManager):
         :param code: код активации
         :param password: пароль, если необходимо сменить
         """
-        async with self.obj.atomic():
-            try:
-                user_obj = await self.obj.get(User, code=code)
-            except DoesNotExist:
-                user = None
-            else:
-                user_obj.code = None
-                if password:
-                    user_obj.password_hash = self.hash(password)
-                user_obj.status = "active"
-                await self.obj.update(user_obj)
-                user = user_obj.dict()
-            return user
+        try:
+            user_obj = await self.obj.get(User, code=code)
+        except DoesNotExist:
+            user = None
+        else:
+            user_obj.code = None
+            if password:
+                user_obj.password_hash = self.hash(password)
+            user_obj.status = "active"
+            await self.obj.update(user_obj)
+            user = user_obj.dict()
+        return user
 
     async def check(self, login=None, email=None):
         """

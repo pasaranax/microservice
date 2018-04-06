@@ -1,13 +1,8 @@
 import logging
-import traceback
 
 from raven.contrib.tornado import AsyncSentryClient
 
-try:
-    import cfg
-except ImportError:
-    from microservice import cfg
-
+import cfg
 from microservice.routes import Router
 
 logging.info("Server starting...")
@@ -17,7 +12,6 @@ from tornado.web import Application
 from tornado.platform.asyncio import AsyncIOMainLoop
 
 import peewee_async
-from microservice.models import connection
 
 
 class Server:
@@ -27,7 +21,13 @@ class Server:
 
         self.app = Application(**cfg.app.tornado_settings)
         self.app.loop = self.loop
-        self.app.objects = peewee_async.Manager(connection, loop=self.loop)
+
+        if hasattr(cfg, "db"):
+            from microservice.models import connection
+            self.app.objects = peewee_async.Manager(connection, loop=self.loop)
+        else:
+            self.app.objects = None
+
         self.app.sentry_client = AsyncSentryClient(cfg.app.sentry_url)
         self.router = Router(handlers)
         self.app.add_handlers("", self.router.routes)

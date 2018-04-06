@@ -3,12 +3,9 @@ from concurrent.futures import CancelledError
 
 import peewee
 import psycopg2
-from peewee import InterfaceError
 from psycopg2.extensions import QueryCanceledError
 
 from microservice.exceptions import ApiError, InternalError, AccessDenied, ReactMessage
-from microservice.managers.session import SessionManager
-from microservice.managers.user import UserManager
 from microservice.functions import location
 from microservice.middleware.user import BaseUser
 
@@ -60,7 +57,7 @@ def check(anonymous=True, roles=None):
 
             try:  # handle db errors
                 return await self.loop.create_task(task(self, *args, **kwargs))
-            except (peewee.OperationalError, psycopg2.OperationalError, peewee.InternalError, InterfaceError) as e:
+            except (peewee.OperationalError, psycopg2.OperationalError, peewee.InternalError, peewee.InterfaceError) as e:
                 logging.error(str(e))
                 self.captureException()
                 await self.on_finish()
@@ -88,9 +85,12 @@ class Session:
         self.request = request
         self.args = args
         self.body = body
-        self.user_manager = UserManager(self.obj)
-        self.session_manager = SessionManager(self.obj)
         self.user = None
+        if obj:
+            from microservice.managers.session import SessionManager
+            from microservice.managers.user import UserManager
+            self.user_manager = UserManager(self.obj)
+            self.session_manager = SessionManager(self.obj)
 
     async def force_login(self, user, network=None, push_token=None):
         """

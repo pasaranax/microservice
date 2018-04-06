@@ -2,13 +2,13 @@ import binascii
 import gzip
 import json
 import logging
+import re
 import traceback
 from base64 import b64decode
 from json import JSONDecodeError
 from time import perf_counter as pc
 from urllib.parse import unquote
 
-import re
 from raven.contrib.tornado import SentryMixin
 from telebot.apihelper import ApiException
 from tornado import gen
@@ -16,16 +16,11 @@ from tornado.escape import json_decode
 from tornado.netutil import is_valid_ip
 from tornado.web import RequestHandler
 
-try:
-    import cfg
-except ImportError:
-    from microservice import cfg
-
+import cfg
 from microservice.exceptions import ApiError
-from microservice.managers.handlerstat import HandlerStatManager
+from microservice.functions import TelegramReporter
 from microservice.metrics import Metrics
 from microservice.middleware.session import Session
-from microservice.functions import TelegramReporter
 
 
 class Answer:
@@ -95,7 +90,6 @@ class BasicHandler(SentryMixinExt, RequestHandler):
         self.json_body = None
         self.session = Session(self.request, self.body, self.args, self.application.objects)
         self.queue = []
-        self.handlerstat_manager = HandlerStatManager(self.application.objects)
         self.version = self.version if hasattr(self, "version") else 0
 
     def prepare(self, *kwargs):
@@ -209,7 +203,6 @@ class BasicHandler(SentryMixinExt, RequestHandler):
             logging.info(log_record)
         Metrics.requests_per_node.inc(1)
         Metrics.requests_total.inc(cfg.app.number_of_nodes)
-        yield from self.loop.create_task(self.update_stat())
 
     def get_current_user(self):
         return dict(self.session.user)
@@ -315,13 +308,3 @@ class BasicHandler(SentryMixinExt, RequestHandler):
 
     def drop_nones(self, d, required=None):
         return {k: v for k, v in d.items() if v is not None or (required and k in required)}
-
-    async def update_stat(self):
-        await self.handlerstat_manager.update(
-            endpoint=self.endpoint,
-            handler_name=self.__class__.__name__,
-            method=self.request.method,
-            handler_version=self.version,
-            api_version=self.api_version,
-            last_ip=self.request.remote_ip
-        )

@@ -4,12 +4,12 @@ import time
 from logging.config import dictConfig
 
 
-class db:
-    host = os.getenv("DB_HOST", "dev.connect.parla.ai")
-    port = os.getenv("DB_PORT", "54321")
-    user = os.getenv("DB_USER", "parla")
-    password = os.getenv("DB_PASS", "iknowkungfu")
-    database = os.getenv("DB_NAME", "parla")
+# class db:
+#     host = os.getenv("DB_HOST", "dev.connect.parla.ai")
+#     port = os.getenv("DB_PORT", "54321")
+#     user = os.getenv("DB_USER", "parla")
+#     password = os.getenv("DB_PASS", "iknowkungfu")
+#     database = os.getenv("DB_NAME", "parla")
 
 
 class app:
