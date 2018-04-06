@@ -16,12 +16,12 @@ from tornado.escape import json_decode
 from tornado.netutil import is_valid_ip
 from tornado.web import RequestHandler
 
-import cfg
-from exceptions import ApiError
-from managers.handlerstat import HandlerStatManager
-from metrics import Metrics
-from middleware.session import Session
-from middleware.functions import TelegramReporter
+from microservice import cfg
+from microservice.exceptions import ApiError
+from microservice.managers.handlerstat import HandlerStatManager
+from microservice.metrics import Metrics
+from microservice.middleware.session import Session
+from microservice.functions import TelegramReporter
 
 
 class Answer:

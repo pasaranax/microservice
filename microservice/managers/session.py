@@ -5,9 +5,9 @@ from os import urandom
 from peewee import DoesNotExist
 from ua_parser import user_agent_parser
 
-import cfg
-from managers.manager import DataManager
-from models import Session
+from microservice import cfg
+from microservice.managers.manager import DataManager
+from microservice.models import Session
 
 
 class SessionManager(DataManager):

@@ -3,7 +3,7 @@ from asyncio import iscoroutine
 from collections import UserDict
 from datetime import datetime, timezone, date, time, timedelta
 
-from exceptions import CurvedHands
+from microservice.exceptions import CurvedHands
 
 
 class Data:

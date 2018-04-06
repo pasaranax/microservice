@@ -2,13 +2,13 @@ from datetime import datetime
 from hashlib import sha1
 from os import urandom
 
-from middleware.functions import send_mail, extract_one, gravatar
+from microservice import cfg
 from peewee import DoesNotExist, IntegrityError
 
-import cfg
-from exceptions import InternalError
-from managers.manager import DataManager
-from models import User, connection
+from microservice.exceptions import InternalError
+from microservice.managers.manager import DataManager
+from microservice.functions import send_mail, extract_one, gravatar
+from microservice.models import User, connection
 
 
 class UserManager(DataManager):

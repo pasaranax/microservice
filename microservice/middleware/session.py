@@ -6,11 +6,11 @@ import psycopg2
 from peewee import InterfaceError
 from psycopg2.extensions import QueryCanceledError
 
-from exceptions import ApiError, InternalError, AccessDenied, ReactMessage
-from managers.session import SessionManager
-from managers.user import UserManager
-from middleware.functions import location
-from middleware.user import BaseUser
+from microservice.exceptions import ApiError, InternalError, AccessDenied, ReactMessage
+from microservice.managers.session import SessionManager
+from microservice.managers.user import UserManager
+from microservice.functions import location
+from microservice.middleware.user import BaseUser
 
 
 def check(anonymous=True, roles=None):

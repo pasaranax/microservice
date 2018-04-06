@@ -1,5 +1,5 @@
-from managers.manager import DataManager
-from models import Social
+from microservice.managers.manager import DataManager
+from microservice.models import Social
 
 
 class SocialManager(DataManager):

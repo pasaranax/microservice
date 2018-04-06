@@ -3,7 +3,7 @@ from peewee_asyncext import PooledPostgresqlExtDatabase
 from playhouse.postgres_ext import JSONField
 from playhouse.shortcuts import model_to_dict, dict_to_model
 
-import cfg
+from microservice import cfg
 
 ACTUAL_VERSION = 1
 
@@ -23,13 +23,13 @@ class BasicModel(Model):
     class Meta:
         database = connection
 
-    # def __str__(self):
-    #     if hasattr(self, "name"):
-    #         name = self.name
-    #     else:
-    #         name = self.id
-    #
-    #     return "<{} {}>".format(self.__class__.__name__, name)
+    def __str__(self):
+        if hasattr(self, "name"):
+            name = self.name
+        else:
+            name = self.id
+
+        return "<{} {}>".format(self.__class__.__name__, name)
 
     def dict(self, recurse=False, **kwargs):
         """

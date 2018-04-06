@@ -1,6 +1,4 @@
-import logging
-
-from models import *
+from microservice.models import connection
 
 
 class Migration:

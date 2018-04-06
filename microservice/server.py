@@ -1,8 +1,8 @@
 import logging
 
-import cfg
 from raven.contrib.tornado import AsyncSentryClient
 
+from microservice import cfg
 from microservice.routes import Router
 
 logging.info("Server starting...")
@@ -12,7 +12,7 @@ from tornado.web import Application
 from tornado.platform.asyncio import AsyncIOMainLoop
 
 import peewee_async
-from models import connection
+from microservice.models import connection
 
 
 class Server:

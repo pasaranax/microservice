@@ -11,7 +11,7 @@ import requests
 from slackclient import SlackClient
 from telebot import TeleBot
 
-import cfg
+from microservice import cfg
 
 
 def email_error(traceback):

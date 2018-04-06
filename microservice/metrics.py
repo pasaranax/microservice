@@ -1,4 +1,4 @@
-from prometheus_client import Gauge, Histogram, Counter, Summary
+from prometheus_client import Gauge, Counter
 
 
 class Metrics:

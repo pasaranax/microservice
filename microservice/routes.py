@@ -1,5 +1,5 @@
-from handlers.handler import BasicHandler
-from handlers.metrics import MetricsHandler
+from microservice.handlers.handler import BasicHandler
+from microservice.handlers.metrics import MetricsHandler
 
 
 class Router:

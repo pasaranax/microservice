@@ -3,7 +3,7 @@ import logging
 from prometheus_client import generate_latest
 from tornado import gen
 
-from handlers.handler import BasicHandler
+from microservice.handlers.handler import BasicHandler
 
 
 class MetricsHandler(BasicHandler):

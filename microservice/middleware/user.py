@@ -1,7 +1,7 @@
 import logging
 from collections import UserDict
 
-from managers.user import UserManager
+from microservice.managers.user import UserManager
 
 
 class BaseUser(UserDict):

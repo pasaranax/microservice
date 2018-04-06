@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from managers.manager import DataManager
-from models import HandlerStat
+from microservice.managers.manager import DataManager
+from microservice.models import HandlerStat
 
 
 class HandlerStatManager(DataManager):
