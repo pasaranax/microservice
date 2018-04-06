@@ -11,26 +11,7 @@ import requests
 from slackclient import SlackClient
 from telebot import TeleBot
 
-try:
-    import cfg
-except ImportError:
-    from microservice import cfg
-
-
-def email_error(traceback):
-    """
-    Отправляет письмо с ошибкой на сервере
-    :param traceback: list of error lines
-    """
-    smtp = SMTP(cfg.app.smtp_host, port=25)
-    smtp.login(cfg.app.smtp_login, cfg.app.smtp_password)
-
-    msg = MIMEText("".join(traceback))
-    msg["Subject"] = "DF Map Error [{}]".format(platform.node())
-    msg["From"] = cfg.app.support_email
-
-    smtp.sendmail(cfg.app.support_email, cfg.app.errors_email, msg.as_string())
-    smtp.quit()
+from microservice import cfg
 
 
 class TelegramReporter:

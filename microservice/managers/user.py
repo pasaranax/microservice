@@ -4,7 +4,7 @@ from os import urandom
 
 from peewee import DoesNotExist, IntegrityError
 
-import cfg
+from microservice import cfg
 from microservice.exceptions import InternalError
 from microservice.functions import send_mail, extract_one, gravatar
 from microservice.managers.manager import DataManager

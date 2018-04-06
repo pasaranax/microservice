@@ -3,7 +3,7 @@ from peewee_asyncext import PooledPostgresqlExtDatabase
 from playhouse.postgres_ext import JSONField
 from playhouse.shortcuts import model_to_dict, dict_to_model
 
-import cfg
+from microservice import cfg
 
 ACTUAL_VERSION = 1
 

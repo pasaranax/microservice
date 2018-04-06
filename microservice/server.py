@@ -2,7 +2,7 @@ import logging
 
 from raven.contrib.tornado import AsyncSentryClient
 
-import cfg
+from microservice import cfg
 from microservice.routes import Router
 
 logging.info("Server starting...")
