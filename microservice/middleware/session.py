@@ -5,7 +5,7 @@ import peewee
 import psycopg2
 from psycopg2.extensions import QueryCanceledError
 
-from functions import check_atomic
+from microservice.functions import check_atomic
 from microservice.exceptions import ApiError, InternalError, AccessDenied, ReactMessage
 from microservice.functions import location
 from microservice.middleware.user import BaseUser
