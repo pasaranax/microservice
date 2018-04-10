@@ -117,14 +117,3 @@ class Session(BasicModel):
     ip = CharField(null=True)
     location = JSONField(null=True)
     last_login = DateTimeField(null=True)
-
-
-class HandlerStat(BasicModel):
-    endpoint = CharField()
-    handler = CharField()
-    method = CharField()
-    handler_version = IntegerField(null=True)
-    api_version = IntegerField()
-    updated = DateTimeField()
-    counter = IntegerField(default=1)
-    last_ip = CharField(null=True)

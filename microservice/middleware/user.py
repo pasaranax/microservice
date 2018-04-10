@@ -2,10 +2,9 @@ import logging
 from collections import UserDict
 
 
-
 class BaseUser(UserDict):
     """
-    Dummy user with teachers subsuers, this object is created every time after successful check_auth
+    Dummy user, this object is created every time after successful @check(anonymous=False)
     """
     def __init__(self, obj, user_dict=None):
         super(BaseUser, self).__init__(user_dict)

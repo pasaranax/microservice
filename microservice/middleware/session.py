@@ -33,7 +33,7 @@ def check(anonymous=True, roles=None):
             async def task(self, *args, **kwargs):
                 async with check_atomic(self.application.objects):
                     try:
-                        me = await self.session.me() if self.application.objects else None
+                        me = await self.session.me() if not anonymous else None
                         if not (me or anonymous):
                             raise AccessDenied("#auth #token Token invalid")
                         elif roles and me["role"] not in roles:
