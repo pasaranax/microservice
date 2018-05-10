@@ -82,13 +82,18 @@ class SentryMixinExt(SentryMixin):
 
 
 class BasicHandler(SentryMixinExt, RequestHandler):
+    session_class = None
+
+    def get_session_class(self):
+        return self.session_class or Session
+
     def initialize(self):
         forwarded_ip = self.request.headers.get("X-Forwarded-For", self.request.remote_ip)
         if is_valid_ip(forwarded_ip):
             self.request.remote_ip = forwarded_ip
         self.loop = self.application.loop
         self.json_body = None
-        self.session = Session(self.request, self.body, self.args, self.application.objects)
+        self.session = self.get_session_class()(self.request, self.body, self.args, self.application.objects)
         self.queue = []
         self.version = self.version if hasattr(self, "version") else 0
 
@@ -97,8 +102,8 @@ class BasicHandler(SentryMixinExt, RequestHandler):
         Выполняется перед  обработкой запроса
         """
         self.add_header('Access-Control-Allow-Origin', '*')
-        self.add_header('Access-Control-Allow-Headers', 'Content-Type, X-Token, X-Client-Type, Origin, '
-                                                        'X-Requested-With, Accept')
+        self.add_header('Access-Control-Allow-Headers', 'Content-Type, %s, X-Client-Type, Origin, '
+                                                        'X-Requested-With, Accept' % self.get_session_class().auth_header)
         self.add_header('Access-Control-Allow-Methods', 'GET, POST, PATCH, PUT, DELETE, OPTIONS, HEAD')
         self.add_header('Access-Control-Allow-Credentials', 'true')
         self.set_header('Content-Type', 'application/json; charset=UTF-8')
@@ -178,7 +183,8 @@ class BasicHandler(SentryMixinExt, RequestHandler):
     def make_log(self):
         log_record = "{}: ({}) {} {} [{}] {} ms (token: {})".format(
             self.get_status(), self.request.remote_ip, self.request.method, unquote(self.request.uri),
-            self.request.headers.get("User-Agent", ""), self.answer.mark_time(), self.request.headers.get("X-Token")
+            self.request.headers.get("User-Agent", ""), self.answer.mark_time(), self.request.headers.get(
+                self.get_session_class().auth_header)
         )
         if self.session.user is not None:
             log_record = "{} ({}: {} {})".format(
@@ -276,7 +282,7 @@ class BasicHandler(SentryMixinExt, RequestHandler):
             data["traceback"] = list(traceback.format_exception(*kwargs["exc_info"]))
             info = {
                 "log": self.make_log(),
-                "token": self.request.headers.get("X-Token", "none"),
+                "token": self.request.headers.get(self.get_session_class().auth_header, "none"),
                 "body": json.dumps(self.body(), sort_keys=True, indent=4, separators=(',', ': '))
             }
             data["error"] = data["traceback"][-1]

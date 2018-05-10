@@ -11,6 +11,8 @@ from microservice.models import Session
 
 
 class SessionManager(DataManager):
+    user_id_key = "id"
+
     async def create(self, user, user_agent, network=None, push_token=None, ip=None, location=None):
         ua_data = user_agent_parser.Parse(user_agent)
         os = ua_data["os"]["family"]
@@ -27,7 +29,7 @@ class SessionManager(DataManager):
                 os=os,
                 client=client,
                 rand=rand,
-                token=self._generate_token(user["id"], os, client, rand),
+                token=self._generate_token(user[self.user_id_key], os, client, rand),
                 expire=datetime.now() + timedelta(days=cfg.app.session_lifetime),
                 ip=ip,
                 location=location
@@ -40,7 +42,7 @@ class SessionManager(DataManager):
         session = session_obj.dict()
 
         return session
-        
+
     def read(self, token):
         try:
             if not token:
@@ -53,7 +55,7 @@ class SessionManager(DataManager):
         except DoesNotExist:
             session = None
         return session
-    
+
     async def delete(self, token):
         try:
             if not token:
@@ -75,7 +77,7 @@ class SessionManager(DataManager):
             session_obj.push_token = push_token
         await self.obj.update(session_obj)
         return session_obj.dict()
-    
+
     def _generate_token(self, user_id, os, client, rand):
         """
         Сгенерировать токен из данных сессии
