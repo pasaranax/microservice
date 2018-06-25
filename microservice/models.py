@@ -59,11 +59,6 @@ class BasicModel(Model):
             setattr(self, k, v)
 
 
-class Schema(BasicModel):
-    key = CharField(unique=True, null=True)
-    value = CharField(null=True)
-
-
 class Migrations(BasicModel):
     name = CharField()
     time = DateTimeField(default=SQL("NOW()"))
