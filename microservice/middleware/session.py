@@ -74,6 +74,17 @@ class Session:
     Авторизует пользователя, сохраняет сессию, контролирует доступ к данным
     Есть доступ ко всем данным запроса
     """
+    usermanager_class = None
+    sessionmanager_class = None
+    auth_header = "X-Token"
+
+    def get_usermanager_class(self):
+        from microservice.managers.user import UserManager
+        return self.usermanager_class or UserManager
+
+    def get_sessionmanager_class(self):
+        from microservice.managers.session import SessionManager
+        return self.sessionmanager_class or SessionManager
 
     def __init__(self, request, body, args, obj):
         """
@@ -89,10 +100,8 @@ class Session:
         self.body = body
         self.user = None
         if obj:
-            from microservice.managers.session import SessionManager
-            from microservice.managers.user import UserManager
-            self.user_manager = UserManager(self.obj)
-            self.session_manager = SessionManager(self.obj)
+            self.user_manager = self.get_usermanager_class()(self.obj)
+            self.session_manager = self.get_sessionmanager_class()(self.obj)
 
     async def force_login(self, user, network=None, push_token=None):
         """
@@ -106,7 +115,7 @@ class Session:
         return user
 
     async def logout(self):
-        token = self.request.headers.get("X-Token", None)
+        token = self.request.headers.get(self.auth_header, None)
         session_result = await self.session_manager.delete(token)
         return session_result
 
@@ -114,7 +123,7 @@ class Session:
         if self.user:
             me = self.user
         else:
-            token = self.request.headers.get("X-Token", token)
+            token = self.request.headers.get(self.auth_header, token)
             me = await self.user_manager.me(token, user_id)
             if me:
                 me = BaseUser(self.obj, me)
@@ -123,7 +132,7 @@ class Session:
         return me
 
     async def update(self, push_token=None):
-        token = self.request.headers.get("X-Token", None)
+        token = self.request.headers.get(self.auth_header, None)
         ip = self.request.remote_ip
         country = await location(ip)
         session = await self.session_manager.update(token, ip, country, push_token)
