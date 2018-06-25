@@ -1,11 +1,9 @@
-from peewee import Model, CharField, DoubleField, ForeignKeyField, PrimaryKeyField, DateTimeField, IntegerField
+from peewee import Model, CharField, DoubleField, ForeignKeyField, PrimaryKeyField, DateTimeField, IntegerField, SQL
 from peewee_asyncext import PooledPostgresqlExtDatabase
 from playhouse.postgres_ext import JSONField
 from playhouse.shortcuts import model_to_dict, dict_to_model
 
 from microservice import cfg
-
-ACTUAL_VERSION = 1
 
 connection = PooledPostgresqlExtDatabase(
     cfg.db.database,
@@ -64,6 +62,11 @@ class BasicModel(Model):
 class Schema(BasicModel):
     key = CharField(unique=True, null=True)
     value = CharField(null=True)
+
+
+class Migrations(BasicModel):
+    name = CharField()
+    time = DateTimeField(default=SQL("NOW()"))
 
 
 class User(BasicModel):

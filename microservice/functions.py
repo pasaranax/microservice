@@ -68,23 +68,6 @@ class TelegramReporter:
         TelegramReporter.bot.send_photo(chat_id, link)
 
 
-class SlackReporter:
-    host = socket.gethostbyname_ex(socket.gethostname())
-    addr = os.environ.get('REMOTE_ADDR', "")
-    bot = SlackClient(cfg.app.slack_token)
-
-    @staticmethod
-    def send_message(channel, message, user=None, only_prod=False):
-        if only_prod and SlackReporter.host[0] not in ("Parla-Production", "Parla-Testing"):
-            return
-        message = (
-            "{}\n"
-            "*Host:* {}, {} "
-            "*DB:* {}"
-        ).format(message, SlackReporter.host, SlackReporter.addr, cfg.db.host)
-        SlackReporter.bot.api_call("chat.postMessage", channel=channel, text=message)
-
-
 async def send_mail(to, text, subject):
     smtp = SMTP_SSL(cfg.app.smtp_host, port=465)
     smtp.login(cfg.app.smtp_login, cfg.app.smtp_password)

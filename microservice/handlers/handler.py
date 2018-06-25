@@ -33,6 +33,7 @@ class Answer:
         Создает ответ на основе словаря data
         """
         self.t = pc() * 1000
+        self.answer = {}
 
     def compose(self, message=None, data=None, error=None, meta=None):
         """
@@ -108,48 +109,52 @@ class BasicHandler(SentryMixinExt, RequestHandler):
             pass
         self.client_platform = self.request.headers.get("X-Platform", "")
         self.client_version = self.request.headers.get("X-Version", "")
-        self.api_version = int(self.request.uri.split("/")[1][1:])
+        try:
+            self.api_version = int(self.request.uri.split("/")[1][1:])
+        except ValueError:
+            self.api_version = 0
         self.endpoint = re.sub("\d", "", "/".join(self.request.uri.split("?")[0].split("/")[2:])).rstrip("/")
         self.answer = Answer()
 
     async def get(self, *kwargs):
-        self.compose(error="#method_not_allowed", status=405)
+        self.compose(error="#method_not_allowed", status=405, send=True)
 
     async def post(self, *kwargs):
-        self.compose(error="#method_not_allowed", status=405)
+        self.compose(error="#method_not_allowed", status=405, send=True)
 
     async def delete(self, *kwargs):
-        self.compose(error="#method_not_allowed", status=405)
+        self.compose(error="#method_not_allowed", status=405, send=True)
 
     async def patch(self, *kwargs):
-        self.compose(error="#method_not_allowed", status=405)
+        self.compose(error="#method_not_allowed", status=405, send=True)
 
     async def put(self, *kwargs):
-        self.compose(error="#method_not_allowed", status=405)
+        self.compose(error="#method_not_allowed", status=405, send=True)
 
     def head(self, *args, **kwargs):
-        self.compose(error="#method_not_allowed", status=405)
+        self.compose(error="#method_not_allowed", status=405, send=True)
 
     def options(self, smth=None):
         self.set_status(204)
         self.finish()
 
-    def compose(self, message=None, result=None, error=None, status=None):
+    def compose(self, message=None, result=None, error=None, status=None, send=False):
         """
-        Отправить ответ в браузер
+        Сформировать ответ
         :param message: сообщение, которое выводится в случае отсутствия ошибки
         :param result: должен содержать параметры data или error
         :param error: текст ошибки
         :param status: кастомный статус код
+        :param send: сразу отправить результат клиенту
         """
         if error or (result and result.error):
             error = str(error) if error else None or result.error
             code, *error_message = error.split(maxsplit=1)
-            error_message = error_message[0] if error_message else ""
+            error_message = "".join(error_message)
             if not code or not code.startswith("#"):
                 code = "#error"
                 error_message = error
-            logging.warning("Client error: '{}'. Body: {}".format(error, self.body()))
+            logging.warning("Error: '{}'. Body: {}".format(error, self.body()))
             # Статус из хештегов
             if not status:
                 if code in ("#auth", "#oauth", "#access_denied"):
@@ -162,13 +167,18 @@ class BasicHandler(SentryMixinExt, RequestHandler):
                     status = 405
             self.set_status(status or 400)
             self.answer.compose(message=None, error={"code": code, "message": error_message})
-        elif result:
-            self.set_status(status or 200)
-            self.answer.compose(message, data=result.data, meta=result.meta)
+            Metrics.errors_4xx.inc(1)
         else:
             self.set_status(status or 200)
-            self.answer.compose(message)
+            if result:
+                result.meta.update(result.kwargs)
+                self.answer.compose(message, data=result.data, meta=result.meta)
+            else:
+                self.answer.compose(message)
+        if send:
+            self.send_result()
 
+    def send_result(self):
         if cfg.app.gzip_output > 0:
             self.set_header('Content-Encoding', 'gzip')
             self.finish(self.answer.gzip())
@@ -176,14 +186,14 @@ class BasicHandler(SentryMixinExt, RequestHandler):
             self.finish(self.answer.dict())
 
     def make_log(self):
-        log_record = "{}: ({}) {} {} [{}] {} ms (token: {})".format(
+        log_record = "{}: ({}) {} {} [{}] {} ms".format(
             self.get_status(), self.request.remote_ip, self.request.method, unquote(self.request.uri),
-            self.request.headers.get("User-Agent", ""), self.answer.mark_time(), self.request.headers.get("X-Token")
+            self.request.headers.get("User-Agent", ""), self.answer.mark_time()
         )
         if self.session.user is not None:
-            log_record = "{} ({}: {} {})".format(
-                log_record,
-                self.session.user["id"], self.session.user["first_name"], self.session.user["last_name"] or "\b\b"
+            log_record = "{} (token: {}, {}: {} {})".format(
+                log_record, self.request.headers.get("X-Token"),
+                self.session.user["id"], self.session.user["first_name"] or self.session.user["email"], self.session.user["last_name"] or "\b",
             )
         return log_record
 
