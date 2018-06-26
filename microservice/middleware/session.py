@@ -104,14 +104,11 @@ class Session:
             self.session_manager = self.get_sessionmanager_class()(self.obj)
 
     async def force_login(self, user, network=None, push_token=None):
-        """
-        Вход по user_id
-        """
         user_agent = self.request.headers.get("User-Agent", "")
         ip = self.request.remote_ip
         country = await location(ip)
         session_result = await self.session_manager.create(user, user_agent, network, push_token, ip=ip, location=country)
-        user["token"] = session_result["result"]["token"]
+        user["token"] = session_result["token"]
         return user
 
     async def logout(self):
