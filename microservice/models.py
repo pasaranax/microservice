@@ -84,6 +84,9 @@ class User(BasicModel):
     money = IntegerField(default=0)
     lang = CharField(default="en")
     timezone = CharField(default="UTC")
+    utm_source = CharField(max_length=1000, null=True)
+    utm_medium = CharField(max_length=1000, null=True)
+    utm_campaign = CharField(max_length=1000, null=True)
 
     def __str__(self):
         return "{id}: {first_name} {last_name} ({pair})".format(**self.dict())
