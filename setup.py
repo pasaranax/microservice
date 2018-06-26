@@ -20,7 +20,6 @@ setup(
         "ua-parser==0.7.3",
         "urllib3==1.22",
         "google-auth==1.0.2",
-        "slackclient==1.1.2",
         "pytz==2018.3",
     ]
 )

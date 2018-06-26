@@ -50,3 +50,23 @@ class DataManager:
 
     def __del__(self):
         self.cache = {k: v for k, v in self.cache.items() if v[0] > datetime.now()}
+
+    @staticmethod
+    def extract_results(results, *args, **kwargs):
+        """
+        Извлечь список из результатов пиви или эластика
+        :param extra_attrs: аттрибуты из результата, которые надо включить в словарь (peewee)
+        :param results: ответ эластика или пиви
+        :return: list
+        """
+        if len(results) > 0:
+            lst = [x.dict(*args, **kwargs) for x in results]
+        else:
+            lst = []
+        return lst
+
+    @staticmethod
+    def extract_one(results, *args, **kwargs):
+        for x in results:
+            return x.dict(*args, **kwargs)
+        return None

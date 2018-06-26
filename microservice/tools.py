@@ -5,6 +5,7 @@ import sys
 
 import migrations
 from microservice.models import connection
+from models import Migrations
 
 
 def migrate():
@@ -41,3 +42,4 @@ if __name__ == '__main__':
     _, func, *args = sys.argv
     globals()[func](*args)
     logging.info("Done")
+    # TODO: переписать с использованием argparse
