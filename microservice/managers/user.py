@@ -6,12 +6,14 @@ from peewee import DoesNotExist, IntegrityError
 
 from microservice import cfg
 from microservice.exceptions import InternalError
-from microservice.functions import send_mail, extract_one, gravatar
+from microservice.functions import send_mail, gravatar
 from microservice.managers.manager import DataManager
 from microservice.models import User
 
 
 class UserManager(DataManager):
+    model = User
+
     async def create(self, user_data):
         """
         Берет юзера из базы, если такой id уже найден
@@ -30,7 +32,7 @@ class UserManager(DataManager):
             status="disabled",
         )
         user_obj, created = await self.obj.get_or_create(
-            User,
+            self.model,
             login=user_data["login"],
             defaults=user_data
         )
@@ -45,7 +47,7 @@ class UserManager(DataManager):
             status="active",
         )
         user_obj, created = await self.obj.get_or_create(
-            User,
+            model,
             login=social_data["login"],
             defaults=social_data
         )
@@ -55,19 +57,19 @@ class UserManager(DataManager):
     async def read(self, user_id=None, login=None, password=None, email=None, network=None):
         try:
             if user_id:
-                user_obj = User.get(id=user_id)
+                user_obj = self.model.get(id=user_id)
                 user = user_obj.dict(recurse=False)
             elif login and password:
-                user_obj = User.get(login=login)
+                user_obj = self.model.get(login=login)
                 if user_obj.password_hash != self.hash(password):
                     user = None
                 else:
                     user = user_obj.dict(recurse=False)
             elif login and network:
-                user_obj = User.get(login=login)
+                user_obj = self.model.get(login=login)
                 user = user_obj.dict(recurse=False)
             elif email:
-                user_obj = User.get(email=email)
+                user_obj = self.model.get(email=email)
                 user = user_obj.dict(recurse=False)
             else:
                 user = None
@@ -76,17 +78,17 @@ class UserManager(DataManager):
         return user
 
     async def me(self, token=None, user_id=None):
-        me_obj = await self.obj.execute(User.raw("""
+        me_obj = await self.obj.execute(self.model.raw("""
             select u.*, row_to_json(s.*) "session"
             from "user" u
             LEFT JOIN "session" s ON u.id = s.user_id
             where (token = %s and s.expire > NOW()) OR u.id = %s
         """, token, user_id))
-        me = extract_one(me_obj, extra_attrs=["session"])
+        me = self.extract_one(me_obj, extra_attrs=["session"])
         return me
 
     async def update(self, user_data):
-        user_obj = await self.obj.get(User, id=user_data["id"])
+        user_obj = await self.obj.get(self.model, id=user_data["id"])
         user = user_obj.dict()
         protected_fields = ["email", "phone", "new_password"]
         need_password = False
@@ -105,7 +107,7 @@ class UserManager(DataManager):
         if user:
             try:
                 user.update(user_data)
-                user_obj = User.from_dict(user, ignore_unknown=True)
+                user_obj = self.model.from_dict(user, ignore_unknown=True)
                 await self.obj.update(user_obj)
             except IntegrityError:
                 user = None
@@ -118,7 +120,7 @@ class UserManager(DataManager):
         :param email: емейл юзера
         """
         try:
-            user_obj = await self.obj.get(User, email=email)
+            user_obj = await self.obj.get(self.model, email=email)
         except DoesNotExist:
             user = None
         else:
@@ -140,7 +142,7 @@ class UserManager(DataManager):
         :param password: пароль, если необходимо сменить
         """
         try:
-            user_obj = await self.obj.get(User, code=code)
+            user_obj = await self.obj.get(self.model, code=code)
         except DoesNotExist:
             user = None
         else:
@@ -158,9 +160,9 @@ class UserManager(DataManager):
         """
         try:
             if login:
-                await self.obj.get(User, login=login)
+                await self.obj.get(self.model, login=login)
             elif email:
-                await self.obj.get(User, email=email)
+                await self.obj.get(self.model, email=email)
             else:
                 raise InternalError("Something wrong")
         except DoesNotExist:

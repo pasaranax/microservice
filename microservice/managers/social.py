@@ -3,9 +3,11 @@ from microservice.models import Social
 
 
 class SocialManager(DataManager):
+    model = Social
+
     async def create(self, user, social_data):
         social_obj, created = await self.obj.get_or_create(
-            Social,
+            self.model,
             user=user["id"],
             network=social_data["reg_method"],
             social_id=social_data.get("social_id"),

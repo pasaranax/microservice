@@ -12,6 +12,7 @@ from microservice.models import Session
 
 class SessionManager(DataManager):
     user_id_key = "id"
+    model = Session
 
     async def create(self, user, user_agent, network=None, push_token=None, ip=None, location=None):
         ua_data = user_agent_parser.Parse(user_agent)
@@ -20,7 +21,7 @@ class SessionManager(DataManager):
         rand = sha1(urandom(16)).hexdigest()
 
         session_obj, created = await self.obj.get_or_create(
-            Session,
+            self.model,
             user=user["id"],
             user_agent=user_agent,
             login_method=network,
@@ -47,7 +48,7 @@ class SessionManager(DataManager):
         try:
             if not token:
                 raise DoesNotExist
-            session_obj = Session.get(token=token)
+            session_obj = self.model.get(token=token)
             if datetime.now() > session_obj.expire:
                 session = None
             else:
@@ -60,7 +61,7 @@ class SessionManager(DataManager):
         try:
             if not token:
                 raise DoesNotExist
-            session_obj = await self.obj.get(Session, token=token)
+            session_obj = await self.obj.get(self.model, token=token)
             await self.obj.delete(session_obj)
             session = None
         except DoesNotExist:
@@ -68,7 +69,7 @@ class SessionManager(DataManager):
         return session
 
     async def update(self, token, ip=None, location=None, push_token=None):
-        session_obj = await self.obj.get(Session, token=token)
+        session_obj = await self.obj.get(self.model, token=token)
         session_obj.expire = datetime.now() + timedelta(days=cfg.app.session_lifetime)
         session_obj.ip = ip
         session_obj.location = location

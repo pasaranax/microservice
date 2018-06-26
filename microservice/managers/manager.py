@@ -5,6 +5,7 @@ class DataManager:
     """
     Менеджер данных выполняет работу с данными в формате CRUD+L(list)
     """
+    model = None
 
     def __init__(self, obj=None):
         """        
