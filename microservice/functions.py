@@ -5,10 +5,9 @@ import platform
 import socket
 from email.mime.text import MIMEText
 from hashlib import md5
-from smtplib import SMTP, SMTP_SSL
+from smtplib import SMTP_SSL
 
 import requests
-from slackclient import SlackClient
 from telebot import TeleBot
 
 from microservice import cfg
