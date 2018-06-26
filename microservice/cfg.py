@@ -95,4 +95,4 @@ else:
 class Enum:
     @classmethod
     def all(cls):
-        return [x for x in cls.__dict__.values() if not x.startswith("_")]
+        return [cls.__dict__[x] for x in cls.__dict__.keys() if not x.startswith("_")]
