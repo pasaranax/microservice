@@ -83,11 +83,14 @@ class _app:
 
 
 try:
-    from cfg import *
+    import cfg
+    if hasattr(cfg, "db"):
+        db = cfg.db
 except ImportError:
+    logging.warning("Missing cfg.py")
     app = _app
 else:
-    for k, v in app.__dict__.items():
+    for k, v in cfg.app.__dict__.items():
         _app.k = v
     app = _app
 

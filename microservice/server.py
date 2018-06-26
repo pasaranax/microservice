@@ -15,8 +15,7 @@ import peewee_async
 
 
 class Server:
-    def __init__(self, cfg, handlers):
-        self.cfg = cfg
+    def __init__(self, handlers):
         AsyncIOMainLoop().install()
         self.loop = asyncio.get_event_loop()
 
