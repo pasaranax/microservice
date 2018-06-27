@@ -19,7 +19,8 @@ class Server:
         AsyncIOMainLoop().install()
         self.loop = asyncio.get_event_loop()
 
-        self.app = Application(**cfg.app.tornado_settings)
+        self.router = Router(handlers)
+        self.app = Application(self.router.routes, **cfg.app.tornado_settings)
         self.app.loop = self.loop
 
         if hasattr(cfg, "db"):
@@ -29,8 +30,7 @@ class Server:
             self.app.objects = None
 
         self.app.sentry_client = AsyncSentryClient(cfg.app.sentry_url)
-        self.router = Router(handlers)
-        self.app.add_handlers("", self.router.routes)
+        # self.app.add_handlers("", self.router.routes)
 
     def run(self):
         try:
