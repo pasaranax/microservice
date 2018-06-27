@@ -80,6 +80,7 @@ class _app:
     time.tzset()
 
     number_of_nodes = 1
+    max_workers_on_executor = 16
 
 
 try:

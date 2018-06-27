@@ -5,6 +5,7 @@ import logging
 import re
 import traceback
 from base64 import b64decode
+from concurrent.futures import ThreadPoolExecutor
 from json import JSONDecodeError
 from time import perf_counter as pc
 from urllib.parse import unquote
@@ -83,6 +84,7 @@ class SentryMixinExt(SentryMixin):
 
 
 class BasicHandler(SentryMixinExt, RequestHandler):
+    executor = ThreadPoolExecutor(max_workers=cfg.app.max_workers_on_executor)
     session_class = None
 
     def get_session_class(self):
