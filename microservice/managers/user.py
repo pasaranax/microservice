@@ -47,7 +47,7 @@ class UserManager(DataManager):
             status="active",
         )
         user_obj, created = await self.obj.get_or_create(
-            model,
+            self.model,
             login=social_data["login"],
             defaults=social_data
         )
