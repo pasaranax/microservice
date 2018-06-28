@@ -115,8 +115,9 @@ def extract_one(results, *args, **kwargs):
 
 
 async def location(ip):
-    country = requests.request("GET", "https://freegeoip.net/json/{}".format(ip)).json()
-    return country
+    # country = requests.request("GET", "https://freegeoip.net/json/{}".format(ip)).json()
+    # TODO: disabled because of service is deprecated
+    return None
 
 
 async def gravatar(email):
