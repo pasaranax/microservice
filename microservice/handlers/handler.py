@@ -272,7 +272,7 @@ class BasicHandler(SentryMixinExt, RequestHandler):
             value = self.json_body.get(name, default)
             if required and value in (None, ""):
                 # self.compose(error="#missing #field {}".format(name))
-                raise ApiError("#missing #field {}".format(name))
+                raise ApiError("#missing #field '{}' {}".format(name, error))
             value = self.valid(name, value, default, coerce, check, error)
             return value
         else:
@@ -282,7 +282,7 @@ class BasicHandler(SentryMixinExt, RequestHandler):
         value = self.get_query_argument(name, default)
         if required and value in (None, ""):
             # self.compose(error="#missing #argument {}".format(name))
-            raise ApiError("#missing #argument {}".format(name))
+            raise ApiError("#missing #argument '{}' {}".format(name, error))
         value = self.valid(name, value, default, coerce, check, error)
         return value
 
