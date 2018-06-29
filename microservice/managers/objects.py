@@ -35,6 +35,5 @@ class Collection(UserList):
 
     def set_class(self, object_class):
         self.object_class = object_class
-        for item in self.items:
-            self.data = map(object_class, item)
+        self.data = [object_class(item) for item in self.items]
         self.valid = True
