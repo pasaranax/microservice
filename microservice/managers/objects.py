@@ -17,6 +17,10 @@ class BasicObject(UserDict):
         """implement it"""
         pass
 
+    def set_model(self):
+        """if object have id, it may be saved to db (o rly?)"""
+        pass
+
 
 class Collection(UserList):
     def __init__(self, items_list, object_class=None):
@@ -32,5 +36,5 @@ class Collection(UserList):
     def set_class(self, object_class):
         self.object_class = object_class
         for item in self.items:
-            self.data.append(item.validate)
+            self.data.append(object_class(item))
         self.valid = True
