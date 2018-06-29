@@ -35,7 +35,7 @@ class Collection(UserList):
     def set_class(self, object_class):
         self.object_class = object_class
         for item in self.items:
-            self.data.append(item.validate)
+            self.data.append(object_class(item))
         self.valid = True
 
 
