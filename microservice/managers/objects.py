@@ -3,8 +3,8 @@ from collections import UserDict, UserList
 
 class BasicObject(UserDict):
     def __init__(self, item_dict):
-        super(BasicObject, self).__init__(item_dict)
-        self.data.update(item_dict)
+        super(BasicObject, self).__init__(item_dict)  # self.data creates here
+        # self.data.update(item_dict)
         self.validate()
         for key in self.data:
             setattr(self, key, self.data[key])
@@ -24,7 +24,7 @@ class BasicObject(UserDict):
 
 class Collection(UserList):
     def __init__(self, items_list, object_class=None):
-        super(Collection, self).__init__(items_list)
+        super(Collection, self).__init__()  # fill list later
         self.object_class = object_class
         self.items = items_list
         if object_class:
