@@ -55,35 +55,35 @@ class UserManager(DataManager):
         return user, created
 
     async def read(self, user_id=None, login=None, password=None, email=None, network=None):
-        try:
             if user_id:
-                user_obj = self.model.get(id=user_id)
-                user = user_obj.dict(recurse=False)
+                user = await self.me(user_id=user_id)
+                if not user:
+                    raise InternalError("#not_found user_id not found")
             elif login and password:
-                user_obj = self.model.get(login=login)
-                if user_obj.password_hash != self.hash(password):
-                    user = None
-                else:
-                    user = user_obj.dict(recurse=False)
+                user = await self.me(login=login)
+                if not user:
+                    raise InternalError("#not_found login not found")
+                if user["password_hash"] != self.hash(password):
+                    raise InternalError("#wrong_password Wrong password")
             elif login and network:
-                user_obj = self.model.get(login=login)
-                user = user_obj.dict(recurse=False)
+                user = await self.me(login=login)
+                if not user:
+                    raise InternalError("#not_found login not found")
             elif email:
-                user_obj = self.model.get(email=email)
-                user = user_obj.dict(recurse=False)
+                user = await self.me(email=email)
+                if not user:
+                    raise InternalError("#not_found email not found")
             else:
-                user = None
-        except DoesNotExist:
-            user = None
-        return user
+                raise InternalError("#missing #field login and password required")
+            return user
 
-    async def me(self, token=None, user_id=None):
+    async def me(self, token=None, user_id=None, login=None, email=None):
         me_obj = await self.obj.execute(self.model.raw("""
             select u.*, row_to_json(s.*) "session"
             from "user" u
             LEFT JOIN "session" s ON u.id = s.user_id
-            where (token = %s and s.expire > NOW()) OR u.id = %s
-        """, token, user_id))
+            where (token = %s and s.expire > NOW()) OR u.id = %s OR u.login = %s OR u.email = %s
+        """, token, user_id, login, email))
         me = self.extract_one(me_obj, extra_attrs=["session"])
         return me
 

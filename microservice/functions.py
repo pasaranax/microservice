@@ -7,7 +7,6 @@ from email.mime.text import MIMEText
 from hashlib import md5
 from smtplib import SMTP_SSL
 
-import requests
 from telebot import TeleBot
 
 from microservice import cfg
