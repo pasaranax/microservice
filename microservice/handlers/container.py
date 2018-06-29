@@ -3,6 +3,7 @@ from asyncio import iscoroutine
 from collections import UserDict
 from datetime import datetime, timezone, date, time, timedelta
 
+from microservice import Collection, BasicObject
 from microservice.exceptions import CurvedHands
 
 
@@ -26,18 +27,7 @@ class Data:
         self.meta = dict()
         self.error = error
         if not error:
-            if type(result) is dict and "hits" in result:
-                # elastic results
-                self.data = [x["_source"] for x in result["hits"]["hits"]]
-                if reformat:
-                    self.data = list(map(self.reformat, self.data))
-                if transpose:
-                    self.transpose(transpose[0], transpose[1])
-                self.count = len(self.data)
-                self.meta["shown"] = self.count
-                self.meta["total"] = result["hits"]["total"]
-                self.data = self._cast(self.data)
-            elif type(result) is list:
+            if isinstance(result, (Collection, list)):
                 # list of objects
                 if need_format:
                     self.data = list(map(self.format, result))
@@ -50,7 +40,7 @@ class Data:
                 self.count = len(self.data)
                 self.meta["shown"] = self.count
                 self.data = self._cast(self.data)
-            elif type(result) is dict or isinstance(result, UserDict):
+            elif isinstance(result, (BasicObject, UserDict, dict)):
                 # single object
                 if need_format:
                     self.data = self.format(result)
@@ -65,8 +55,8 @@ class Data:
                 raise CurvedHands("You forgot 'await' statement")
             else:
                 self.data = result
-                logging.debug("Data is is unknown format: {}".format(self.data))
-                self.error = "Data is is unknown format"
+                logging.debug("Data is in unknown format: {}".format(self.data))
+                self.error = "Data is in unknown format"
             if meta:
                 self.meta.update(meta)
         else:
