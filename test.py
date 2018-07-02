@@ -1,12 +1,19 @@
+from microservice.managers.objects import BasicObject
+
 from microservice import Server, BasicHandler, check, Data
 
 
 class TestHandler_v1(BasicHandler):
     @check()
     async def get(self, me):
-        result = {
-            "hello": "world"
-        }
+        result = BasicObject(
+            {
+                "hello": "world",
+                "nested": {
+                    "hello": "continent"
+                }
+            }
+        )
         data = Data(result=result)
         self.compose("Hello", data)
 

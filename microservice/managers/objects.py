@@ -46,6 +46,16 @@ class BasicObject(UserDict):
         """if object have id, it may be saved to db (o rly?)"""
         pass
 
+    def dict(self):
+        """return raw dict"""
+        raw_dict = {}
+        for k, v in self.data.items():
+            if isinstance(v, BasicObject):
+                raw_dict[k] = v.dict()
+            else:
+                raw_dict[k] = v
+        return raw_dict
+
 
 class Collection(UserList):
     def __init__(self, items_list, object_class=None):
