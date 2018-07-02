@@ -1,6 +1,6 @@
 from collections import UserDict, UserList
 
-from exceptions import ApiError
+from microservice.exceptions import ApiError
 
 
 class BasicObject(UserDict):
