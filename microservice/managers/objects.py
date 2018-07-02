@@ -67,8 +67,22 @@ class Collection(UserList):
         else:
             self.data = []
             self.valid = False
+        self._index = None
 
     def set_class(self, object_class):
         self.object_class = object_class
         self.data = [object_class(item) for item in self.items]
         self.valid = True
+
+    @property
+    def ix(self):
+        if not self._index and len(self) > 0 and self[0].get("id"):
+            self._index = {v["id"]: v for v in self}
+        else:
+            return self._index
+
+    def join(self, children, foreign_key, group_name):
+        for item in children:
+            if not hasattr(self.ix[item[foreign_key]], group_name):
+                self.ix[item[foreign_key]][group_name] = []
+            self.ix[item[foreign_key]][group_name].append(children)
