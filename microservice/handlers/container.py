@@ -105,19 +105,21 @@ class Data:
         Если значение является словарем или списком, преобразует рекурсивно
         """
         # преобразовать определенные типы (добавить нужное)
-        if type(value) in (datetime, time):
+        if isinstance(value, (datetime, time)):
             return value.replace(tzinfo=timezone.utc).isoformat()
-        elif type(value) is date:
+        elif isinstance(value, date):
             return value.replace().isoformat()
-        elif type(value) is timedelta:
+        elif isinstance(value, timedelta):
             return value.days
+        elif isinstance(value, BasicObject):
+            return value.dict()
         elif iscoroutine(value):
             raise CurvedHands("You forgot 'await' statement")
 
         # рекурсивно пройтись по элементам списка или словаря
-        elif type(value) is dict:
+        elif isinstance(value, dict):
             return {k: self._cast(v) for k, v in value.items()}
-        elif type(value) is list:
+        elif isinstance(value, list):
             return [self._cast(v) for v in value]
         else:
             return value

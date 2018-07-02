@@ -42,8 +42,6 @@ class Answer:
         Необходимо вызвать для составления ответа
         """
         assert message is not None or error is not None
-        if isinstance(data, BasicObject):
-            data = data.dict()
         self.answer = {"message": message, "error": error, "data": data, "meta": meta}
 
     def dict(self):
