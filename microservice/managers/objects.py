@@ -81,7 +81,7 @@ class Collection(UserList):
         return self._ix
 
     def join(self, children, foreign_key, group_name):
-        for item in children:
-            if not self.ix[item[foreign_key]].get(group_name):
-                self.ix[item[foreign_key]][group_name] = []
-            self.ix[item[foreign_key]][group_name].append(children)
+        for i in self.data:
+            i[group_name] = []
+        for child in children:
+            self.ix[child[foreign_key]][group_name].append(child)
