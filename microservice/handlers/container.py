@@ -111,15 +111,13 @@ class Data:
             return value.replace().isoformat()
         elif isinstance(value, timedelta):
             return value.days
-        elif isinstance(value, BasicObject):
-            return value.dict()
         elif iscoroutine(value):
             raise CurvedHands("You forgot 'await' statement")
 
         # рекурсивно пройтись по элементам списка или словаря
-        elif isinstance(value, dict):
+        elif isinstance(value, (dict, BasicObject)):
             return {k: self._cast(v) for k, v in value.items()}
-        elif isinstance(value, list):
+        elif isinstance(value, (list, Collection)):
             return [self._cast(v) for v in value]
         else:
             return value
