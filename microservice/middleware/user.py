@@ -1,27 +1,19 @@
 import logging
-from collections import UserDict
+
+from microservice.managers.objects import BasicObject
 
 
-class BaseUser(UserDict):
+class BaseUser(BasicObject):
     """
     Dummy user, this object is created every time after successful @check(anonymous=False)
     """
     def __init__(self, obj, user_dict=None):
         super(BaseUser, self).__init__(user_dict)
-        self.data.update(user_dict)  # for the purposes of reconstructing
-        if self.data:
-            for key in self.data:
-                setattr(self, key, self.data[key])
-
         self.obj = obj
         self.user_dict = user_dict
         if obj:
             from microservice.managers.user import UserManager
             self.user_manager = UserManager(obj)
-
-    def __setitem__(self, key, value):
-        self.data[key] = value
-        setattr(self, key, value)
 
     async def reincarnate(self, user_id):
         result = await self.user_manager.me(user_id=user_id)

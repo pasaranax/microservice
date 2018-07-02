@@ -1,5 +1,7 @@
 from collections import UserDict, UserList
 
+from exceptions import ApiError
+
 
 class BasicObject(UserDict):
     def __init__(self, item_dict):
@@ -16,6 +18,27 @@ class BasicObject(UserDict):
     def validate(self):
         """implement it"""
         pass
+
+    def valid(self, name, value, default=None, coerce=None, check=None, error=""):
+        """
+        Проверить значение на валидность
+        :param error: текст в случае ошибки
+        :param value: значение
+        :param default: если значение None, то взять default
+        :param coerce: привести к типу или применить функцию
+        :param check: проверить функцией (должна вернуть True)
+        :return: возвращает значение
+        """
+        if value is None:
+            value = default
+        if coerce and value is not None:
+            try:
+                value = coerce(value)
+            except ValueError:
+                raise ApiError("#wrong_type {}, expected {}. {}".format(name, coerce, error))
+        if check and value is not None and not check(value):
+            raise ApiError("#wrong_format {}. {}".format(name, error))
+        return value
 
     def set_model(self):
         """if object have id, it may be saved to db (o rly?)"""
