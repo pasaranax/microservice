@@ -9,6 +9,8 @@ class BasicObject(UserDict):
         # self.data.update(item_dict)
         self.validate()
         for key in self.data:
+            if isinstance(self.data[key], dict):
+                self.data[key] = BasicObject(self.data[key])
             setattr(self, key, self.data[key])
 
     def __setitem__(self, key, value):
