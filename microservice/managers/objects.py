@@ -83,6 +83,6 @@ class Collection(UserList):
 
     def join(self, children, foreign_key, group_name):
         for item in children:
-            if not hasattr(self.ix[item[foreign_key]], group_name):
+            if not self.ix[item[foreign_key]].get(group_name):
                 self.ix[item[foreign_key]][group_name] = []
             self.ix[item[foreign_key]][group_name].append(children)
