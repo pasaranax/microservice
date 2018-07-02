@@ -10,6 +10,7 @@ from json import JSONDecodeError
 from time import perf_counter as pc
 from urllib.parse import unquote
 
+from microservice.managers.objects import BasicObject
 from raven.contrib.tornado import SentryMixin
 from telebot.apihelper import ApiException
 from tornado import gen
@@ -41,7 +42,7 @@ class Answer:
         Необходимо вызвать для составления ответа
         """
         assert message is not None or error is not None
-        if data:
+        if isinstance(data, BasicObject):
             data = data.dict()
         self.answer = {"message": message, "error": error, "data": data, "meta": meta}
 
