@@ -67,7 +67,7 @@ class Collection(UserList):
         else:
             self.data = []
             self.valid = False
-        self._index = None
+        self._ix = None
 
     def set_class(self, object_class):
         self.object_class = object_class
@@ -76,10 +76,9 @@ class Collection(UserList):
 
     @property
     def ix(self):
-        if not self._index and len(self) > 0 and self[0].get("id"):
-            self._index = {v["id"]: v for v in self}
-        else:
-            return self._index
+        if not self._ix and len(self) > 0 and self[0].get("id"):
+            self._ix = {v["id"]: v for v in self}
+        return self._ix
 
     def join(self, children, foreign_key, group_name):
         for item in children:
