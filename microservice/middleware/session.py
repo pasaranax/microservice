@@ -1,5 +1,7 @@
 import logging
 from concurrent.futures import CancelledError
+from sys import exc_info
+from traceback import print_exc
 
 import peewee
 import psycopg2
@@ -56,6 +58,11 @@ def check(anonymous=True, roles=None):
                     except (QueryCanceledError, CancelledError) as e:
                         me.capture_exception()
                         self.compose(error="#db_error query cancelled: {}".format(e), status=500, send=True)
+                    except Exception as e:
+                        me.capture_exception()
+                        print_exc()
+                        self.write_error(500, exc_info=exc_info())
+
 
             try:  # handle db errors
                 return await self.loop.create_task(task(self, *args, **kwargs))
