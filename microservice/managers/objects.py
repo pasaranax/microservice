@@ -6,7 +6,8 @@ from microservice.exceptions import ApiError
 
 class BasicObject(UserDict):
     def __init__(self, item_dict: dict):
-        super(BasicObject, self).__init__(item_dict)  # self.data creates here
+        super(BasicObject, self).__init__()  # self.data creates here
+        self.input = item_dict
         self.validate()
         # after this moment self.data is validated and may be converted to object fields
         for key in self.data:
@@ -23,12 +24,12 @@ class BasicObject(UserDict):
         setattr(self, key, value)
 
     def validate(self):
-        """implement it"""
+        """implement it otherwise self.data will be empty"""
         pass
 
     def valid(self, name, default=None, coerce=None, check=None, error="", required=False, allow_none=False):
         """
-        validate field and coerce it if needed
+        Validate field and coerce it if needed. Each call fill self.data with new field.
         :param name: field name
         :param default: default value if name not presents in data
         :param coerce: coerce to type of function
@@ -37,7 +38,7 @@ class BasicObject(UserDict):
         :param required: set True if field is required
         :param allow_none: set True if param may be None, else None values will be removed
         """
-        value = self.data.get(name, default)
+        value = self.input.get(name, default)
         if required and value in (None, ""):
             raise ApiError("#missing #field '{}' {}".format(name, error))
         if value is None:
@@ -53,13 +54,8 @@ class BasicObject(UserDict):
             if callable(check) and not check(value):
                 raise ApiError("#wrong_format {}. {}".format(name, error))
         # final
-        if value is not None:
+        if value is not None or allow_none:
             self.data[name] = value
-        else:
-            if allow_none and name in self.data:
-                self.data[name] = value
-            elif name in self.data:
-                del self.data[name]
 
     def set_model(self):
         """if object have id, it may be saved to db (o rly?)"""

@@ -11,10 +11,12 @@ class NestedListObj(BasicObject):
 class TestValidator(BasicObject):
     def validate(self):
         self.valid("hello", coerce=str, required=True)  # normal required field
-        self.valid("nested_obj", coerce=TestValidator, allow_none=True),  #
+        self.valid("nested_obj", coerce=TestValidator, allow_none=True),  # nullable and will passed validation
         self.valid("empty_field")  # not nullable will be removed
-        self.valid("nested_list", coerce=Collection.with_class(NestedListObj))
-        self.valid("deeper_list", coerce=Collection.with_class())
+        self.valid("nested_list", coerce=Collection.with_class(NestedListObj))  # list of NestedListObj compatible
+        self.valid("any_list", coerce=Collection)  # any list
+        self.valid("deeper_list", coerce=list)  # same
+        self.valid("value")
         self.valid("lang", check=["ru", "en"])
 
 
@@ -26,14 +28,17 @@ class TestHandler_v1(BasicHandler):
                 "hello": "world",
                 "nested_obj": {
                     "hello": "continent",
-                    "nested_obj": None
+                    "nested_obj": None,
+                    "illegal_field": "should be filtered"
                 },
                 "nested_list": [
                     {"a": "b", "c": "d"}
                 ],
+                "any_list": ["apple", "banana"],
                 "deeper_list": [
                     [1, 2, 3]
                 ],
+                "value": 0,
                 "lang": "en"
             }
         ], TestValidator)
