@@ -12,10 +12,10 @@ class BasicObject(UserDict):
         for key in self.data:
             if isinstance(self.data[key], dict):
                 self.data[key] = BasicObject(self.data[key])
-                logging.warning("Nested object without class {}: {}".format(self.__class__.__name__, key))
+                # logging.warning("Nested object without class {}: {}".format(self.__class__.__name__, key))
             elif isinstance(self.data[key], list):
                 self.data[key] = Collection(self.data[key])
-                logging.warning("Nested list without class {}: {}".format(self.__class__.__name__, key))
+                # logging.warning("Nested list without class {}: {}".format(self.__class__.__name__, key))
             setattr(self, key, self.data[key])
 
     def __setitem__(self, key, value):
@@ -87,7 +87,7 @@ class Collection(UserList):
             self.valid = True
         else:
             self.valid = False
-            logging.warning("Collection object class is not set: {}".format(__name__))
+            # logging.warning("Collection object class is not set: {}".format(__name__))
         self._ix = None
 
     def set_class(self, object_class):
