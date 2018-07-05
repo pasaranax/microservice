@@ -10,8 +10,9 @@ class NestedListObj(BasicObject):
 
 class TestValidator(BasicObject):
     def validate(self):
-        self.valid("hello", coerce=str, required=True)
-        self.valid("nested_obj", coerce=TestValidator, nullable=True),
+        self.valid("hello", coerce=str, required=True)  # normal required field
+        self.valid("nested_obj", coerce=TestValidator, allow_none=True),  #
+        self.valid("empty_field")  # not nullable will be removed
         self.valid("nested_list", coerce=Collection.with_class(NestedListObj))
         self.valid("deeper_list", coerce=Collection.with_class())
 

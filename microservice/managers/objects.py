@@ -26,7 +26,7 @@ class BasicObject(UserDict):
         """implement it"""
         pass
 
-    def valid(self, name, default=None, coerce=None, check=None, error="", required=False, nullable=False):
+    def valid(self, name, default=None, coerce=None, check=None, error="", required=False, allow_none=False):
         """
         validate field and coerce it if needed
         :param name: field name
@@ -35,7 +35,7 @@ class BasicObject(UserDict):
         :param check: check function must return True if passed
         :param error: error text if any of checks not passed
         :param required: set True if field is required
-        :param nullable: set True if param may be None, else None values will be removed
+        :param allow_none: set True if param may be None, else None values will be removed
         """
         value = self.data.get(name, default)
         if required and value in (None, ""):
@@ -49,11 +49,13 @@ class BasicObject(UserDict):
                 raise ApiError("#wrong_type {}, expected {}. {}".format(name, coerce, error))
         if check and value is not None and not check(value):
             raise ApiError("#wrong_format {}. {}".format(name, error))
-        if value is None and not nullable:
-            if name in self.data:
-                del self.data[name]
-        else:
+        if value is not None:
             self.data[name] = value
+        else:
+            if allow_none and name in self.data:
+                self.data[name] = value
+            elif name in self.data:
+                del self.data[name]
 
     def set_model(self):
         """if object have id, it may be saved to db (o rly?)"""
