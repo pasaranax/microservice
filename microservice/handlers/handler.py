@@ -10,7 +10,6 @@ from json import JSONDecodeError
 from time import perf_counter as pc
 from urllib.parse import unquote
 
-from microservice.managers.objects import BasicObject
 from raven.contrib.tornado import SentryMixin
 from telebot.apihelper import ApiException
 from tornado import gen
