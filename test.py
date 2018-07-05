@@ -15,12 +15,13 @@ class TestValidator(BasicObject):
         self.valid("empty_field")  # not nullable will be removed
         self.valid("nested_list", coerce=Collection.with_class(NestedListObj))
         self.valid("deeper_list", coerce=Collection.with_class())
+        self.valid("lang", check=["ru", "en"])
 
 
 class TestHandler_v1(BasicHandler):
     @check()
     async def get(self, me):
-        result = TestValidator(
+        result = Collection([
             {
                 "hello": "world",
                 "nested_obj": {
@@ -28,13 +29,14 @@ class TestHandler_v1(BasicHandler):
                     "nested_obj": None
                 },
                 "nested_list": [
-                    {"a": "b"}
+                    {"a": "b", "c": "d"}
                 ],
                 "deeper_list": [
                     [1, 2, 3]
-                ]
+                ],
+                "lang": "en"
             }
-        )
+        ], TestValidator)
         data = Data(result=result)
         self.compose("Hello", data)
 

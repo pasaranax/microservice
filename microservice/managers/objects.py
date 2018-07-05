@@ -47,8 +47,12 @@ class BasicObject(UserDict):
                 value = coerce(value)
             except ValueError:
                 raise ApiError("#wrong_type {}, expected {}. {}".format(name, coerce, error))
-        if check and value is not None and not check(value):
-            raise ApiError("#wrong_format {}. {}".format(name, error))
+        if check and value is not None:
+            if isinstance(check, (list, tuple)) and value not in check:
+                raise ApiError("#wrong_format {} not in {}. {}".format(name, check, error))
+            if callable(check) and not check(value):
+                raise ApiError("#wrong_format {}. {}".format(name, error))
+        # final
         if value is not None:
             self.data[name] = value
         else:
@@ -75,7 +79,8 @@ class BasicObject(UserDict):
 class Collection(UserList):
     object_class = None
 
-    def __init__(self, items_list):
+    def __init__(self, items_list, object_class=None):
+        self.object_class = object_class or self.object_class
         super(Collection, self).__init__(items_list)
         if self.object_class:
             self.set_class(self.object_class)
