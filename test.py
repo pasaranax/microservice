@@ -1,17 +1,37 @@
-from microservice.managers.objects import BasicObject
+from microservice.managers.objects import BasicObject, Collection
 
 from microservice import Server, BasicHandler, check, Data
+
+
+class NestedListObj(BasicObject):
+    def validate(self):
+        self.valid("a", coerce=str)
+
+
+class TestValidator(BasicObject):
+    def validate(self):
+        self.valid("hello", coerce=str, required=True)
+        self.valid("nested_obj", coerce=TestValidator, nullable=True),
+        self.valid("nested_list", coerce=Collection.with_class(NestedListObj))
+        self.valid("deeper_list", coerce=Collection.with_class())
 
 
 class TestHandler_v1(BasicHandler):
     @check()
     async def get(self, me):
-        result = BasicObject(
+        result = TestValidator(
             {
                 "hello": "world",
-                "nested": {
-                    "hello": "continent"
-                }
+                "nested_obj": {
+                    "hello": "continent",
+                    "nested_obj": None
+                },
+                "nested_list": [
+                    {"a": "b"}
+                ],
+                "deeper_list": [
+                    [1, 2, 3]
+                ]
             }
         )
         data = Data(result=result)
