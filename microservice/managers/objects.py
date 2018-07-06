@@ -68,6 +68,8 @@ class BasicObject(UserDict):
         for k, v in self.data.items():
             if isinstance(v, BasicObject):
                 raw_dict[k] = v.dict()
+            elif isinstance(v, Collection):
+                raw_dict[k] = [i.dict() for i in v]
             else:
                 raw_dict[k] = v
         return raw_dict
