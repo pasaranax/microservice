@@ -89,6 +89,9 @@ class BasicObject(UserDict):
     def __str__(self):
         return json.dumps(self.data)
 
+    def default(self):
+        return json.dumps(self.data)
+
 
 class Collection(UserList):
     object_class = None
