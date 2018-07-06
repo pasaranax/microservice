@@ -1,3 +1,4 @@
+import json
 import logging
 from collections import UserDict, UserList
 
@@ -81,6 +82,12 @@ class BasicObject(UserDict):
             if getattr(self, var):
                 self[enum_name] = var
                 break
+
+    def __repr__(self):
+        return json.dumps(self.data)
+
+    def __str__(self):
+        return json.dumps(self.data)
 
 
 class Collection(UserList):
