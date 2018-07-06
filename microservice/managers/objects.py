@@ -126,4 +126,4 @@ class Collection(UserList):
         :param variants: flags
         """
         for item in self.data:
-            item.group_enum(enum_name, *variants)
+            item.group_enum(enum_name, variants)
