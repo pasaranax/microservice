@@ -71,7 +71,7 @@ class BasicObject(UserDict):
                 raw_dict[k] = v
         return raw_dict
 
-    def group_enum(self, enum_name, *variants):
+    def group_enum(self, enum_name, variants):
         """
         Group several boolean flags into one enum field
         :param enum_name: name of new field
@@ -119,7 +119,7 @@ class Collection(UserList):
         cls.object_class = object_class or BasicObject
         return cls
 
-    def group_enum(self, enum_name, *variants):
+    def group_enum(self, enum_name, variants):
         """
         Group several boolean flags into one enum field
         :param enum_name: name of new field
