@@ -69,7 +69,7 @@ class BasicObject(UserDict):
             if isinstance(v, BasicObject):
                 raw_dict[k] = v.dict()
             elif isinstance(v, Collection):
-                raw_dict[k] = [i.dict() for i in v]
+                raw_dict[k] = v.list()
             else:
                 raw_dict[k] = v
         return raw_dict
@@ -139,3 +139,14 @@ class Collection(UserList):
         """
         for item in self.data:
             item.group_enum(enum_name, variants)
+
+    def list(self):
+        raw_list = []
+        for v in self.data:
+            if isinstance(v, BasicObject):
+                raw_list.append(v.dict())
+            elif isinstance(v, Collection):
+                raw_list.append(v.list())
+            else:
+                raw_list.append(v)
+        return raw_list
