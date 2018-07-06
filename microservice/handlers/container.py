@@ -134,12 +134,13 @@ class Data:
         else:
             self.data = {x[key]: x for x in self.data}
 
-    def group_by(self, field):
+    def group_by(self, field, objects=False):
         """
         Превратить список элементов в словарь, в котором элементы сгруппированы по полю field, аналог group by в sql
         ключом является значение поля field
         значением является список элементов, у которых было определенное поле field
         количество групп - количество уникальных значений field
+        :param objects: создать объекты, а не строки
         :param field: поле для группировки
         """
         groups = {}
@@ -147,6 +148,8 @@ class Data:
             if not item[field] in groups:
                 groups[item[field]] = []
             groups[item[field]].append(item)
+        if objects:
+            groups = [{field: k, "objects": v} for k, v in groups.items()]
         self.data = groups
 
     def __str__(self):
