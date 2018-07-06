@@ -1,6 +1,7 @@
 import logging
 import os
 import time
+from enum import Enum
 from logging.config import dictConfig
 
 
@@ -96,7 +97,7 @@ else:
     app = _app
 
 
-class Enum:
+class Enum(Enum):
     @classmethod
     def all(cls):
         return [cls.__dict__[x] for x in cls.__dict__.keys() if not x.startswith("_")]
