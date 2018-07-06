@@ -48,16 +48,6 @@ class BasicModel(Model):
         model = dict_to_model(cls, d, ignore_unknown=ignore_unknown)
         return model
 
-    def __getitem__(self, item):
-        return self.__getattribute__(item)
-
-    def __setitem__(self, key, value):
-        self.__setattr__(key, value)
-
-    def update_from_dict(self, d):
-        for k, v in d.items():
-            setattr(self, k, v)
-
 
 class Migrations(BasicModel):
     name = CharField()
