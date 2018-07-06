@@ -6,7 +6,7 @@ from microservice.exceptions import ApiError
 
 class BasicObject(UserDict):
     def __init__(self, item_dict: dict):
-        super(BasicObject, self).__init__()  # self.data creates here
+        super(BasicObject, self).__init__()  # empty until validated
         self.input = item_dict
         self.validate()
         # after this moment self.data is validated and may be converted to object fields
@@ -24,8 +24,8 @@ class BasicObject(UserDict):
         setattr(self, key, value)
 
     def validate(self):
-        """implement it otherwise self.data will be empty"""
-        pass
+        """implement it otherwise self.data will be filled from self.input directly"""
+        self.data = self.input
 
     def valid(self, name, default=None, coerce=None, check=None, error="", required=False, allow_none=False):
         """
