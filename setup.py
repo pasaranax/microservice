@@ -15,10 +15,10 @@ setup(
         "prometheus-client==0.3.0",
         "pyTelegramBotAPI==3.6.3",
         "raven==6.9.0",
-        "requests==2.19.1",
+        "requests==2.18.4",
         "tornado==5.0.2",
         "ua-parser==0.8.0",
-        "urllib3==1.23",
+        "urllib3==1.22",
         "google-auth==1.5.0",
         "pytz==2018.5",
     ]
