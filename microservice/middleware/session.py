@@ -83,6 +83,7 @@ class Session:
     usermanager_class = None
     sessionmanager_class = None
     auth_header = "X-Token"
+    base_user_class = BaseUser
 
     def get_usermanager_class(self):
         from microservice.managers.user import UserManager
@@ -129,7 +130,7 @@ class Session:
             token = self.request.headers.get(self.auth_header, token)
             me = await self.user_manager.me(token, user_id)
             if me:
-                me = BaseUser(self.obj, me)
+                me = self.base_user_class(self.obj, me)
                 me["token"] = token
             self.user = me
         return me
