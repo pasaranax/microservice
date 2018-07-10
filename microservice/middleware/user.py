@@ -15,6 +15,9 @@ class BaseUser(BasicObject):
             from microservice.managers.user import UserManager
             self.user_manager = UserManager(obj)
 
+    async def save(self):
+        await self.user_manager.update(self.data)
+
     async def reincarnate(self, user_id):
         result = await self.user_manager.me(user_id=user_id)
         self.__init__(self.obj, result)
