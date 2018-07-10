@@ -49,16 +49,17 @@ class TelegramReporter:
                 TelegramReporter.bot.send_message(config["chat_id"], text, parse_mode="html")
 
     @staticmethod
-    def send_message(chat_id, message, user=None, only_prod=False, ignore_tests=True):
+    def send_message(chat_id, message, only_prod=False, ignore_tests=True, footer=True):
         if ignore_tests and TelegramReporter.host[0].startswith("runner"):
             return
-        if only_prod and TelegramReporter.host[0] != "Parla-Production":
+        if only_prod and "Production" not in TelegramReporter.host[0]:
             return
-        message = (
-            "{}\n"
-            "<b>Host:</b> {}, {} "
-            "<b>DB:</b> {}"
-        ).format(message, TelegramReporter.host, TelegramReporter.addr, cfg.db.host)
+        if footer:
+            message = (
+                "{}\n"
+                "<b>Host:</b> {}, {} "
+                "<b>DB:</b> {} "
+            ).format(message, TelegramReporter.host, TelegramReporter.addr, cfg.db.host)
         TelegramReporter.bot.send_message(chat_id, message, disable_web_page_preview=True, parse_mode="html")
 
     @staticmethod
