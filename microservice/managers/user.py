@@ -93,7 +93,7 @@ class UserManager(DataManager):
         protected_fields = ["email", "phone", "new_password"]
         need_password = False
         for field in protected_fields:
-            if field in user_data:
+            if field in user_data and user_data[field] != user[field]:
                 need_password = True
 
         if need_password:
