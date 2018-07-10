@@ -21,10 +21,7 @@ class UserManager(DataManager):
         """
         if not user_data.get("picture"):
             avatar = await gravatar(user_data["login"])
-            user_data["picture"] = {
-                "large": avatar,
-                "small": avatar
-            }
+            user_data["picture"] = None
         user_data.update(
             password_hash=self.hash(user_data["password"]) if user_data["password"] else None,
             code=sha1(urandom(16)).hexdigest() if user_data["reg_method"] else None,
@@ -55,27 +52,27 @@ class UserManager(DataManager):
         return user, created
 
     async def read(self, user_id=None, login=None, password=None, email=None, network=None):
-            if user_id:
-                user = await self.me(user_id=user_id)
-                if not user:
-                    raise InternalError("#not_found user_id not found")
-            elif login and password:
-                user = await self.me(login=login)
-                if not user:
-                    raise InternalError("#not_found login not found")
-                if user["password_hash"] != self.hash(password):
-                    raise InternalError("#wrong_password Wrong password")
-            elif login and network:
-                user = await self.me(login=login)
-                if not user:
-                    raise InternalError("#not_found login not found")
-            elif email:
-                user = await self.me(email=email)
-                if not user:
-                    raise InternalError("#not_found email not found")
-            else:
-                raise InternalError("#missing #field login and password required")
-            return user
+        if user_id:
+            user = await self.me(user_id=user_id)
+            if not user:
+                raise InternalError("#not_found user_id not found")
+        elif login and password:
+            user = await self.me(login=login)
+            if not user:
+                raise InternalError("#not_found login not found")
+            if user["password_hash"] != self.hash(password):
+                raise InternalError("#wrong_password Wrong password")
+        elif login and network:
+            user = await self.me(login=login)
+            if not user:
+                raise InternalError("#not_found login not found")
+        elif email:
+            user = await self.me(email=email)
+            if not user:
+                raise InternalError("#not_found email not found")
+        else:
+            raise InternalError("#missing #field login and password required")
+        return user
 
     async def me(self, token=None, user_id=None, login=None, email=None):
         me_obj = await self.obj.execute(self.model.raw("""
@@ -127,11 +124,11 @@ class UserManager(DataManager):
             user_obj.code = sha1(urandom(16)).hexdigest()
             user_obj.status = "recovery"
             await self.obj.update(user_obj)
-            await send_mail(
-                email,
-                cfg.app.recovery_text.format(user_obj.code),
-                cfg.app.recovery_subject
-            )
+            # await send_mail(
+            #     email,
+            #     cfg.app.recovery_text.format(user_obj.code),
+            #     cfg.app.recovery_subject
+            # )
             user = user_obj.dict()
         return user
 

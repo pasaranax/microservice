@@ -1,5 +1,7 @@
 import logging
 
+from microservice.managers.user import UserManager
+
 from microservice.managers.objects import BasicObject
 
 
@@ -7,13 +9,14 @@ class BaseUser(BasicObject):
     """
     Dummy user, this object is created every time after successful @check(anonymous=False)
     """
+    user_manager_class = UserManager
+
     def __init__(self, obj, user_dict=None):
         super(BaseUser, self).__init__(user_dict)
         self.obj = obj
         self.user_dict = user_dict
         if obj:
-            from microservice.managers.user import UserManager
-            self.user_manager = UserManager(obj)
+            self.user_manager = self.user_manager_class(obj)
 
     async def save(self):
         await self.user_manager.update(self.data)
