@@ -1,4 +1,5 @@
 import logging
+from traceback import print_exc
 
 from raven.contrib.tornado import AsyncSentryClient
 
@@ -19,6 +20,7 @@ class Server:
         AsyncIOMainLoop().install()
         self.loop = asyncio.get_event_loop()
 
+        self.sentry_client = AsyncSentryClient(cfg.app.sentry_url)
         self.router = Router(handlers)
         self.app = Application(self.router.routes, **cfg.app.tornado_settings)
         self.app.loop = self.loop
@@ -29,8 +31,7 @@ class Server:
         else:
             self.app.objects = None
 
-        self.app.sentry_client = AsyncSentryClient(cfg.app.sentry_url)
-        # self.app.add_handlers("", self.router.routes)
+        self.app.sentry_client = self.sentry_client
 
     def run(self):
         try:
@@ -40,3 +41,8 @@ class Server:
         except KeyboardInterrupt:
             self.loop.close()
             logging.info("Server stopped")
+        except:
+            print_exc()
+            self.sentry_client.captureException()
+            logging.error("Server crashed!")
+            exit(1)

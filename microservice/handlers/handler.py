@@ -91,6 +91,7 @@ class BasicHandler(SentryMixinExt, RequestHandler):
         return self.session_class or Session
 
     def initialize(self):
+        self.answer = Answer()
         forwarded_ip = self.request.headers.get("X-Forwarded-For", self.request.remote_ip)
         if is_valid_ip(forwarded_ip):
             self.request.remote_ip = forwarded_ip
@@ -99,6 +100,10 @@ class BasicHandler(SentryMixinExt, RequestHandler):
         self.session = self.get_session_class()(self.request, self.body, self.args, self.application.objects)
         self.queue = []
         self.version = self.version if hasattr(self, "version") else 0
+
+    def init(self):
+        """Redefine this method instead of self.initialize()"""
+        pass
 
     def prepare(self, *kwargs):
         """
@@ -121,21 +126,21 @@ class BasicHandler(SentryMixinExt, RequestHandler):
         except ValueError:
             self.api_version = 0
         self.endpoint = re.sub("\d", "", "/".join(self.request.uri.split("?")[0].split("/")[2:])).rstrip("/")
-        self.answer = Answer()
+        self.init()
 
-    async def get(self, *kwargs):
+    async def get(self, **kwargs):
         self.compose(error="#method_not_allowed", status=405, send=True)
 
-    async def post(self, *kwargs):
+    async def post(self, **kwargs):
         self.compose(error="#method_not_allowed", status=405, send=True)
 
-    async def delete(self, *kwargs):
+    async def delete(self, **kwargs):
         self.compose(error="#method_not_allowed", status=405, send=True)
 
-    async def patch(self, *kwargs):
+    async def patch(self, **kwargs):
         self.compose(error="#method_not_allowed", status=405, send=True)
 
-    async def put(self, *kwargs):
+    async def put(self, **kwargs):
         self.compose(error="#method_not_allowed", status=405, send=True)
 
     def head(self, *args, **kwargs):
@@ -302,11 +307,10 @@ class BasicHandler(SentryMixinExt, RequestHandler):
                 try:
                     TelegramReporter.telegram_error(data["traceback"], info)
                 except ApiException as e:
-                    logging.warning("Can't send telegram report: {}".format(e))
                     try:
-                        info["body"] = "Too big body (truncated)"
-                        TelegramReporter.telegram_error(data["traceback"], info)
+                        TelegramReporter.telegram_error(data["traceback"][-5:], info)
                     except ApiException as e:
+                        info["body"] = "Too big body (truncated)"
                         logging.warning("Can't send telegram report: {}".format(e))
                         TelegramReporter.telegram_error(data["traceback"][-5:], info)
         if cfg.app.debug:

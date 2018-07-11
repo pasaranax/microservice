@@ -53,21 +53,19 @@ def check(anonymous=True, roles=None):
                         self.compose(error="#api_error {}".format(e), send=True)
                     except AccessDenied as e:
                         self.compose(error="#access_denied {}".format(e), status=401, send=True)
-                    except ReactMessage as e:
-                        self.compose(error="#message {}".format(e))
                     except (QueryCanceledError, CancelledError) as e:
-                        me.capture_exception()
+                        self.capture_exception()
                         self.compose(error="#db_error query cancelled: {}".format(e), status=500, send=True)
-                    except Exception as e:
-                        logging.error(str(e))
-                        me.capture_exception()
-                        print_exc()
-                        self.write_error(500, exc_info=exc_info())
+                    # except Exception as e:
+                    #     logging.error(str(e))
+                    #     self.capture_exception()
+                    #     print_exc()
+                    #     self.write_error(500, exc_info=exc_info())
 
             try:  # handle db errors
                 return await self.loop.create_task(task(self, *args, **kwargs))
             except (peewee.OperationalError, psycopg2.OperationalError, peewee.InternalError, peewee.InterfaceError) as e:
-                logging.error(str(e))
+                print_exc()
                 self.captureException()
                 await self.on_finish()
                 exit(1)
