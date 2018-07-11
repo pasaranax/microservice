@@ -33,10 +33,7 @@ class _app:
 
     push_android_api_key = "123"
 
-    oauth_networks = ["facebook", "google", "vk", "twitter"]
-
-    twitter_api_key = "123"
-    twitter_api_secret = "123"
+    oauth_networks = ["facebook", "google", "vk"]
 
     telegram_secret = "another random string"
 
@@ -73,7 +70,7 @@ class _app:
         },
     }
 
-    for handler in ["tornado", "botocore", "boto3", "pymorphy2"]:  # ignored logging users
+    for handler in ["tornado", "botocore", "boto3"]:  # ignored logging users
         logging.getLogger(handler).setLevel(logging.ERROR)
     dictConfig(logging_config)
     os.environ["TZ"] = timezone
