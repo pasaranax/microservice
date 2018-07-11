@@ -1,6 +1,6 @@
 from peewee_asyncext import PooledPostgresqlExtDatabase
 
-from microservice import cfg
+from microservice import cfg, BasicObject
 from peewee import Model, CharField, DoubleField, ForeignKeyField, PrimaryKeyField, DateTimeField, IntegerField, SQL
 from playhouse.postgres_ext import JSONField
 from playhouse.shortcuts import model_to_dict, dict_to_model
@@ -47,6 +47,10 @@ class BasicModel(Model):
         """
         model = dict_to_model(cls, d, ignore_unknown=ignore_unknown)
         return model
+
+    def build_object(self, recurse=False, **kwargs):
+        obj = BasicObject(model_to_dict(self, recurse, **kwargs))
+        return obj
 
 
 class Migrations(BasicModel):

@@ -17,19 +17,19 @@ class DataManager:
         if obj is not None:
             self.obj = obj
     
-    def create(self, *kwargs):
+    def create(self, **kwargs):
         return None
     
-    def read(self, *kwargs):
+    def read(self, **kwargs):
         return None
     
-    def update(self, *kwargs):
+    def update(self, **kwargs):
         return None
     
-    def delete(self, *kwargs):
+    def delete(self, **kwargs):
         return None
     
-    def list(self, *kwargs):
+    def list(self, **kwargs):
         return None
 
     def save_cache(self, user, name, value, lifetime=timedelta(days=1)):
