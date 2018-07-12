@@ -14,5 +14,5 @@ class AccessDenied(BaseException):
     pass
 
 
-class ReactMessage(BaseException):
+class CriticalError(BaseException):
     pass
