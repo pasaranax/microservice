@@ -8,12 +8,18 @@ class SocialManager(DataManager):
     async def create(self, user, social_data):
         social_obj, created = await self.obj.get_or_create(
             self.model,
-            user=user["id"],
             network=social_data["reg_method"],
             social_id=social_data.get("social_id"),
             defaults={
-                "access_token": social_data.get("access_token")
+                "access_token": social_data.get("access_token"),
+                "user": user["id"]
             }
         )
-        social = social_obj.dict()
+        social = social_obj.build_object()
         return social
+
+    async def read(self, network, social_id):
+        res = await self.obj.get(Social, network=network, social_id=social_id)
+        if res:
+            social = res.build_object()
+            return social
