@@ -1,13 +1,11 @@
-import logging
 from concurrent.futures import CancelledError
-from sys import exc_info
 from traceback import print_exc
 
 import peewee
 import psycopg2
 from psycopg2.extensions import QueryCanceledError
 
-from microservice.exceptions import ApiError, InternalError, AccessDenied, ReactMessage
+from microservice.exceptions import ApiError, InternalError, AccessDenied
 from microservice.functions import check_atomic
 from microservice.functions import location
 from microservice.middleware.user import BaseUser
@@ -35,7 +33,7 @@ def check(anonymous=True, roles=None):
             async def task(self, *args, **kwargs):
                 async with check_atomic(self.application.objects):
                     try:
-                        me = await self.session.me() if not anonymous else None
+                        me = await self.session.me()
                         if not (me or anonymous):
                             raise AccessDenied("#auth #token Token invalid")
                         elif roles and me["role"] not in roles:
