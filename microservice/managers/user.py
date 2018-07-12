@@ -4,9 +4,8 @@ from os import urandom
 
 from peewee import DoesNotExist, IntegrityError
 
-from microservice import cfg
-from microservice.exceptions import InternalError
-from microservice.functions import send_mail, gravatar
+from microservice.exceptions import InternalError, ApiError
+from microservice.functions import gravatar
 from microservice.managers.manager import DataManager
 from microservice.models import User
 
@@ -38,15 +37,15 @@ class UserManager(DataManager):
         user = user_obj.dict()
         return user
 
-    async def oauth(self, social_data):
-        social_data.update(
+    async def oauth(self, user_data):
+        user_data.update(
             registration_date=datetime.now(),
             status="active",
         )
         user_obj, created = await self.obj.get_or_create(
             self.model,
-            login=social_data["login"],
-            defaults=social_data
+            login=user_data["login"],
+            defaults=user_data
         )
         user = user_obj.dict()
         return user, created
@@ -90,7 +89,7 @@ class UserManager(DataManager):
         protected_fields = ["email", "phone", "new_password"]
         need_password = False
         for field in protected_fields:
-            if field in user_data and user_data[field] != user[field]:
+            if field in user_data:
                 need_password = True
 
         if need_password:
@@ -98,16 +97,15 @@ class UserManager(DataManager):
                 if user_data.get("new_password"):
                     user_data["password_hash"] = self.hash(user_data["new_password"])
             else:
-                user = None
+                raise ApiError("#missing Need password to change registration data")
 
         # изменение данных
-        if user:
-            try:
-                user.update(user_data)
-                user_obj = self.model.from_dict(user, ignore_unknown=True)
-                await self.obj.update(user_obj)
-            except IntegrityError:
-                user = None
+        try:
+            user.update(user_data)
+            user_obj = self.model.from_dict(user, ignore_unknown=True)
+            await self.obj.update(user_obj)
+        except IntegrityError:
+            raise InternalError("Error when updating registration data")
 
         return user
 
