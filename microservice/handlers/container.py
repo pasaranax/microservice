@@ -2,6 +2,7 @@ import logging
 from asyncio import iscoroutine
 from collections import UserDict
 from datetime import datetime, timezone, date, time, timedelta
+from uuid import UUID
 
 from microservice.managers.objects import Collection, BasicObject
 from microservice.exceptions import CurvedHands
@@ -111,6 +112,8 @@ class Data:
             return value.replace().isoformat()
         elif isinstance(value, timedelta):
             return value.days
+        elif isinstance(value, UUID):
+            return str(value)
         elif iscoroutine(value):
             raise CurvedHands("You forgot 'await' statement")
 
