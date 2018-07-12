@@ -2,11 +2,11 @@ import json
 import logging
 from collections import UserDict, UserList
 
-from microservice.exceptions import ApiError
+from microservice.exceptions import ApiError, InternalError, CriticalError
 
 
 class BasicObject(UserDict):
-    def __init__(self, item_dict: dict):
+    def __init__(self, item_dict: dict, obj=None):
         super(BasicObject, self).__init__()  # empty until validated
         self.input = item_dict
         self.validate()
@@ -19,6 +19,8 @@ class BasicObject(UserDict):
                 self.data[key] = Collection(self.data[key])
                 # logging.warning("Nested list without class {}: {}".format(self.__class__.__name__, key))
             setattr(self, key, self.data[key])
+        self.model = None
+        self.obj = obj
 
     def __setitem__(self, key, value):
         self.data[key] = value
@@ -58,9 +60,18 @@ class BasicObject(UserDict):
         if value is not None or allow_none:
             self.data[name] = value
 
-    def set_model(self):
+    def set_model(self, model, obj=None):
         """if object have id, it may be saved to db (o rly?)"""
-        pass
+        self.model = model
+        self.obj = obj or self.obj
+
+    async def save(self):
+        if not self.model or not self.obj:
+            raise CriticalError("Model or objects manager is not set")
+        if not self.get("id"):
+            raise CriticalError("Object id is not set")
+        model = self.model.from_dict(self.dict())
+        await self.obj.update(model)
 
     def dict(self):
         """return raw dict"""
