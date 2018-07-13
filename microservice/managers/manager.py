@@ -1,6 +1,6 @@
 from datetime import timedelta, datetime
 
-from microservice.managers.objects import BasicObject, Collection
+from microservice.middleware.objects import BasicObject, Collection
 
 
 class DataManager:

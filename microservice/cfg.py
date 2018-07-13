@@ -14,7 +14,7 @@ class _app:
 
     timezone = "UTC"  # server timezone
 
-    gzip_output = 9  # compress level; 0 - off, 9 - max
+    gzip_output = 0  # compress level; 0 - off, 9 - max
 
     tornado_settings = {
         "debug": debug,

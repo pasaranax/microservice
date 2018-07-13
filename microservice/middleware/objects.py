@@ -1,8 +1,8 @@
 import json
-import logging
 from collections import UserDict, UserList
+from copy import copy
 
-from microservice.exceptions import ApiError, InternalError, CriticalError
+from microservice.exceptions import ApiError, CriticalError
 
 
 class BasicObject(UserDict):
@@ -105,6 +105,14 @@ class BasicObject(UserDict):
     def default(self):
         return json.dumps(self.data)
 
+    def __sub__(self, other):
+        """return dict with fields which is differs in self and other"""
+        res = BasicObject({})
+        for key in self:
+            if self[key] != other.get(key):
+                res[key] = self[key]
+        return res
+
 
 class Collection(UserList):
     object_class = None
@@ -139,8 +147,9 @@ class Collection(UserList):
 
     @classmethod
     def with_class(cls, object_class=None):
-        cls.object_class = object_class or BasicObject
-        return cls
+        new_cls = copy(cls)
+        new_cls.object_class = object_class or BasicObject
+        return new_cls
 
     def group_enum(self, enum_name, variants):
         """

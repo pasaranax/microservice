@@ -1,6 +1,6 @@
 import logging
 
-from microservice.managers.objects import BasicObject
+from microservice.middleware.objects import BasicObject
 
 
 class BaseUser(BasicObject):

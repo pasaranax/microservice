@@ -4,6 +4,7 @@ from os import urandom
 
 from peewee import DoesNotExist, IntegrityError
 
+from microservice import BasicObject
 from microservice.exceptions import InternalError, ApiError
 from microservice.functions import gravatar
 from microservice.managers.manager import DataManager
@@ -85,7 +86,9 @@ class UserManager(DataManager):
 
     async def update(self, user_data):
         user_obj = await self.obj.get(self.model, id=user_data["id"])
-        user = user_obj.dict()
+        user = user_obj.build_object()
+        if isinstance(user_data, BasicObject):
+            user_data -= user
         protected_fields = ["email", "phone", "new_password"]
         need_password = False
         for field in protected_fields:

@@ -4,7 +4,7 @@ from collections import UserDict
 from datetime import datetime, timezone, date, time, timedelta
 from uuid import UUID
 
-from microservice.managers.objects import Collection, BasicObject
+from microservice.middleware.objects import Collection, BasicObject
 from microservice.exceptions import CurvedHands
 
 

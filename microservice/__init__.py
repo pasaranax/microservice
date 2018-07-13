@@ -3,4 +3,4 @@ from microservice.handlers.handler import BasicHandler
 from microservice.managers.manager import DataManager
 from microservice.middleware.session import check
 from microservice.server import Server
-from microservice.managers.objects import BasicObject, Collection
+from microservice.middleware.objects import BasicObject, Collection
