@@ -1,11 +1,62 @@
 import json
+import logging
 from collections import UserDict, UserList
 from copy import copy
 
 from microservice.exceptions import ApiError, CriticalError
 
 
-class BasicObject(UserDict):
+class SerializableMixin:
+    def list(self, l=None):
+        """return raw list"""
+        raw_list = []
+        for v in l if l is not None else self:
+            if isinstance(v, BasicObject):
+                raw_list.append(v.dict(v))
+            elif isinstance(v, Collection):
+                raw_list.append(v.list(v))
+            elif isinstance(v, dict):
+                raw_list.append(self.dict(v))
+            elif isinstance(v, list):
+                raw_list.append(self.list(v))
+            else:
+                raw_list.append(v)
+        return raw_list
+
+    def dict(self, d=None):
+        """return raw dict"""
+        raw_dict = {}
+        for k, v in d.items() if d is not None else self:
+            if isinstance(v, BasicObject):
+                raw_dict[k] = v.dict(v)
+            elif isinstance(v, Collection):
+                raw_dict[k] = v.list(v)
+            elif isinstance(v, dict):
+                raw_dict[k] = self.dict(v)
+            elif isinstance(v, list):
+                raw_dict[k] = self.list(v)
+            else:
+                raw_dict[k] = v
+        return raw_dict
+
+    def json(self):
+        if isinstance(self, BasicObject):
+            return json.dumps(self.dict())
+        elif isinstance(self, Collection):
+            return json.dumps(self.list())
+
+    @classmethod
+    def from_json(cls, s):
+        return cls(json.loads(s))
+
+    def __repr__(self):
+        return self.json()
+
+    def __str__(self):
+        return self.json()
+
+
+class BasicObject(UserDict, SerializableMixin):
     def __init__(self, item_dict: dict, obj=None):
         super(BasicObject, self).__init__()  # empty until validated
         self.input = item_dict
@@ -73,18 +124,6 @@ class BasicObject(UserDict):
         model = self.model.from_dict(self.dict())
         await self.obj.update(model)
 
-    def dict(self):
-        """return raw dict"""
-        raw_dict = {}
-        for k, v in self.data.items():
-            if isinstance(v, BasicObject):
-                raw_dict[k] = v.dict()
-            elif isinstance(v, Collection):
-                raw_dict[k] = v.list()
-            else:
-                raw_dict[k] = v
-        return raw_dict
-
     def group_enum(self, enum_name, variants):
         """
         Group several boolean flags into one enum field
@@ -96,15 +135,6 @@ class BasicObject(UserDict):
                 self[enum_name] = var
                 break
 
-    def __repr__(self):
-        return json.dumps(self.data)
-
-    def __str__(self):
-        return json.dumps(self.data)
-
-    def default(self):
-        return json.dumps(self.data)
-
     def __sub__(self, other):
         """return dict with fields which is differs in self and other"""
         res = BasicObject({})
@@ -114,7 +144,7 @@ class BasicObject(UserDict):
         return res
 
 
-class Collection(UserList):
+class Collection(UserList, SerializableMixin):
     object_class = None
 
     def __init__(self, items_list, object_class=None):
@@ -159,14 +189,3 @@ class Collection(UserList):
         """
         for item in self.data:
             item.group_enum(enum_name, variants)
-
-    def list(self):
-        raw_list = []
-        for v in self.data:
-            if isinstance(v, BasicObject):
-                raw_list.append(v.dict())
-            elif isinstance(v, Collection):
-                raw_list.append(v.list())
-            else:
-                raw_list.append(v)
-        return raw_list
