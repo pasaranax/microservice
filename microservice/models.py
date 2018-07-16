@@ -1,6 +1,7 @@
 from peewee_asyncext import PooledPostgresqlExtDatabase
 
-from microservice import cfg, BasicObject
+from microservice import BasicObject
+import cfg
 from peewee import Model, CharField, DoubleField, ForeignKeyField, PrimaryKeyField, DateTimeField, IntegerField, SQL
 from playhouse.postgres_ext import JSONField
 from playhouse.shortcuts import model_to_dict, dict_to_model

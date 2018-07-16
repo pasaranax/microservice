@@ -3,7 +3,7 @@ from traceback import print_exc
 
 from raven.contrib.tornado import AsyncSentryClient
 
-from microservice import cfg
+import cfg
 from microservice.routes import Router
 
 logging.info("Server starting...")

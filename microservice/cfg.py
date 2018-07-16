@@ -4,7 +4,7 @@ import time
 from logging.config import dictConfig
 
 
-class _app:
+class app:
     debug = bool(os.getenv("DEBUG", True))
     port = 8001
     workdir = os.path.dirname(os.path.abspath(__file__))
@@ -79,19 +79,6 @@ class _app:
     number_of_nodes = 1
     max_workers_on_executor = 16
     ipstack_api_key = ""
-
-
-try:
-    import cfg
-    if hasattr(cfg, "db"):
-        db = cfg.db
-except ImportError:
-    logging.warning("Missing cfg.py")
-    app = _app
-else:
-    for k, v in cfg.app.__dict__.items():
-        _app.k = v
-    app = _app
 
 
 class Enum:

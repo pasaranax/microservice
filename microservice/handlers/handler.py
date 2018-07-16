@@ -17,7 +17,7 @@ from tornado.escape import json_decode
 from tornado.netutil import is_valid_ip
 from tornado.web import RequestHandler
 
-from microservice import cfg
+import cfg
 from microservice.exceptions import ApiError
 from microservice.functions import TelegramReporter
 from microservice.metrics import Metrics
