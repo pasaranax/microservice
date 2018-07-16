@@ -118,10 +118,14 @@ class Data:
             raise CurvedHands("You forgot 'await' statement")
 
         # рекурсивно пройтись по элементам списка или словаря
-        elif isinstance(value, (dict, BasicObject)):
+        elif isinstance(value, dict):
             return {k: self._cast(v) for k, v in value.items()}
-        elif isinstance(value, (list, Collection)):
+        elif isinstance(value, list):
             return [self._cast(v) for v in value]
+        elif isinstance(value, BasicObject):
+            return self._cast(value.dict())
+        elif isinstance(value, Collection):
+            return self._cast(value.list())
         else:
             return value
 

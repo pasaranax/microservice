@@ -26,7 +26,7 @@ class SerializableMixin:
     def dict(self, d=None):
         """return raw dict"""
         raw_dict = {}
-        for k, v in d.items() if d is not None else self:
+        for k, v in d.items() if d is not None else self.items():
             if isinstance(v, BasicObject):
                 raw_dict[k] = v.dict(v)
             elif isinstance(v, Collection):
