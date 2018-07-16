@@ -78,6 +78,7 @@ class _app:
 
     number_of_nodes = 1
     max_workers_on_executor = 16
+    ipstack_api_key = ""
 
 
 try:

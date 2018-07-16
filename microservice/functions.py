@@ -7,6 +7,7 @@ from email.mime.text import MIMEText
 from hashlib import md5
 from smtplib import SMTP_SSL
 
+import requests
 from telebot import TeleBot
 
 from microservice import cfg
@@ -115,9 +116,8 @@ def extract_one(results, *args, **kwargs):
 
 
 async def location(ip):
-    # country = requests.request("GET", "https://freegeoip.net/json/{}".format(ip)).json()
-    # TODO: disabled because of service is deprecated
-    return None
+    country = requests.request("GET", "http://api.ipstack.com/{}?access_key={}".format(ip, cfg.app.ipstack_api_key)).json()
+    return country
 
 
 async def gravatar(email):
