@@ -264,12 +264,11 @@ class BasicHandler(SentryMixinExt, RequestHandler):
             if self.json_body is None:
                 try:
                     self.json_body = json_decode(self.request.body)
-                    if type(self.json_body) not in (dict, list):
+                    if not isinstance(self.json_body, (dict, list)):
                         raise JSONDecodeError("Body must be dict or list", self.json_body, 0)
-                except JSONDecodeError as e:
+                except (JSONDecodeError, UnicodeDecodeError) as e:
                     self.json_body = dict()
-                    # self.compose(error="#json #parse {}".format(e))
-                    raise ApiError("#json #parse {}".format(e))
+                    # raise ApiError("#json #parse {}".format(e))
         else:
             self.json_body = dict()
 
