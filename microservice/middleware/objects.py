@@ -173,7 +173,10 @@ class Collection(UserList, SerializableMixin):
         for i in self.data:
             i[group_name] = []
         for child in children:
-            self.ix[child[foreign_key]][group_name].append(child)
+            try:
+                self.ix[child[foreign_key]][group_name].append(child)
+            except KeyError:
+                logging.error("Lost object index: {} id {}".format(foreign_key, child[foreign_key]))
 
     @classmethod
     def with_class(cls, object_class=None):
