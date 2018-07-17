@@ -1,5 +1,8 @@
+try:
+    from handlers.metrics import MetricsHandler
+except ImportError:
+    from microservice.handlers.metrics import MetricsHandler
 from microservice.handlers.handler import BasicHandler
-from microservice.handlers.metrics import MetricsHandler
 
 
 class Router:
