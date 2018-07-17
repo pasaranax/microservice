@@ -86,7 +86,7 @@ class UserManager(DataManager):
 
     async def update(self, user_data):
         user_obj = await self.obj.get(self.model, id=user_data["id"])
-        user = user_obj.build_object()
+        user = user_obj.object()
         if isinstance(user_data, BasicObject):
             user_data -= user
         protected_fields = ["email", "phone", "new_password"]

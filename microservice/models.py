@@ -49,7 +49,7 @@ class BasicModel(Model):
         model = dict_to_model(cls, d, ignore_unknown=ignore_unknown)
         return model
 
-    def build_object(self, recurse=False, **kwargs):
+    def object(self, recurse=False, **kwargs):
         obj = BasicObject(model_to_dict(self, recurse, **kwargs))
         return obj
 

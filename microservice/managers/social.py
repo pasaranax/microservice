@@ -15,11 +15,11 @@ class SocialManager(DataManager):
                 "user": user["id"]
             }
         )
-        social = social_obj.build_object()
+        social = social_obj.object()
         return social
 
     async def read(self, network, social_id):
         res = await self.obj.get(Social, network=network, social_id=social_id)
         if res:
-            social = res.build_object()
+            social = res.object()
             return social
