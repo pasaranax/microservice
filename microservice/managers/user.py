@@ -164,9 +164,9 @@ class UserManager(DataManager):
             else:
                 raise InternalError("Something wrong")
         except DoesNotExist:
-            return False
+            return "not_found"
         else:
-            return True
+            return "found"
 
     def hash(self, password):
         """
