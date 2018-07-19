@@ -6,7 +6,6 @@ from raven.contrib.tornado import AsyncSentryClient
 import cfg
 from microservice.routes import Router
 
-logging.info("Server starting...")
 
 import asyncio
 from tornado.web import Application
@@ -17,6 +16,7 @@ import peewee_async
 
 class Server:
     def __init__(self, handlers):
+        logging.info("Server starting...")
         AsyncIOMainLoop().install()
         self.loop = asyncio.get_event_loop()
 
