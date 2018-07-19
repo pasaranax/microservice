@@ -1,7 +1,7 @@
 import json
 import logging
 from collections import UserDict, UserList
-from copy import copy
+from copy import copy, deepcopy
 
 from microservice.exceptions import ApiError, CriticalError
 
@@ -180,15 +180,16 @@ class Collection(UserList, SerializableMixin):
 
     @classmethod
     def with_class(cls, object_class=None):
-        new_cls = copy(cls)
+        new_cls = deepcopy(cls)
         new_cls.object_class = object_class or BasicObject
+        logging.debug("Redefined class in collection: {} (Collection id {}), original: {} (Collection id {})".format(new_cls.object_class, id(new_cls), cls.object_class, id(cls)))
         return new_cls
 
     def group_enum(self, enum_name, variants):
         """
         Group several boolean flags into one enum field
-        :param enum_name: name of new field
-        :param variants: flags
+        :param enum_name: str name of new field
+        :param variants: list flags
         """
         for item in self.data:
             item.group_enum(enum_name, variants)
