@@ -179,11 +179,11 @@ class Collection(UserList, SerializableMixin):
                 logging.error("Lost object index: {} id {}".format(foreign_key, child[foreign_key]))
 
     @classmethod
-    def with_class(cls, object_class=None):
-        new_cls = deepcopy(cls)
-        new_cls.object_class = object_class or BasicObject
-        logging.debug("Redefined class in collection: {} (Collection id {}), original: {} (Collection id {})".format(new_cls.object_class, id(new_cls), cls.object_class, id(cls)))
-        return new_cls
+    def with_class(cls, object_class_=None):
+        class TypedCollection(Collection):
+            object_class = object_class_ or BasicObject
+        logging.debug("Redefined class in collection: {} (Collection id {}), original: {} (Collection id {})".format(TypedCollection.object_class, id(TypedCollection), cls.object_class, id(cls)))
+        return TypedCollection
 
     def group_enum(self, enum_name, variants):
         """
