@@ -68,17 +68,17 @@ class TelegramReporter:
         TelegramReporter.bot.send_photo(chat_id, link)
 
 
-async def send_mail(to, text, subject):
+def send_mail(to, text, subject, type="plain"):
     smtp = SMTP_SSL(cfg.app.smtp_host, port=465)
     smtp.login(cfg.app.smtp_login, cfg.app.smtp_password)
 
-    msg = MIMEText(text or "")
+    msg = MIMEText(text or "", _subtype=type)
     msg["Subject"] = subject
     msg["From"] = cfg.app.smtp_from
+    msg["To"] = to
 
     smtp.sendmail(cfg.app.support_email, to, msg.as_string())
     smtp.quit()
-    logging.info("Email sent to {}: {}".format(to, subject))
 
 
 def chunks(iterable, n):
@@ -95,24 +95,24 @@ def chunks(iterable, n):
         yield chunk
 
 
-def extract_results(results, *args, **kwargs):
-    """
-    Извлечь список из результатов пиви или эластика
-    :param extra_attrs: аттрибуты из результата, которые надо включить в словарь (peewee)
-    :param results: ответ эластика или пиви
-    :return: list
-    """
-    if len(results) > 0:
-        lst = [x.dict(*args, **kwargs) for x in results]
-    else:
-        lst = []
-    return lst
-
-
-def extract_one(results, *args, **kwargs):
-    for x in results:
-        return x.dict(*args, **kwargs)
-    return None
+# def extract_results(results, *args, **kwargs):
+#     """
+#     Извлечь список из результатов пиви или эластика
+#     :param extra_attrs: аттрибуты из результата, которые надо включить в словарь (peewee)
+#     :param results: ответ эластика или пиви
+#     :return: list
+#     """
+#     if len(results) > 0:
+#         lst = [x.dict(*args, **kwargs) for x in results]
+#     else:
+#         lst = []
+#     return lst
+#
+#
+# def extract_one(results, *args, **kwargs):
+#     for x in results:
+#         return x.dict(*args, **kwargs)
+#     return None
 
 
 async def location(ip):
