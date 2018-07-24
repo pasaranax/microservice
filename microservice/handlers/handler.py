@@ -88,7 +88,7 @@ class SentryMixinExt(SentryMixin):
 class BasicHandler(SentryMixinExt, RequestHandler):
     executor = ThreadPoolExecutor(max_workers=cfg.app.max_workers_on_executor)
     session_class = None
-    cache_method = "user"
+    cache_method = "user"  # "all", None
     cache_lifetime = 10
 
     def get_session_class(self):
@@ -134,7 +134,7 @@ class BasicHandler(SentryMixinExt, RequestHandler):
         self.endpoint = re.sub("\d", "", "/".join(self.request.uri.split("?")[0].split("/")[2:])).rstrip("/")
 
         # Caching: if cache found don't call method, just return cached answer
-        if self.cache_lifetime > 0:
+        if self.cache_method is not None:
             hash_exists = await self.cache.check_request(self.request_hash(for_user=self.cache_method == "user"))
             if hash_exists:
                 restored_answer = await self.cache.restore_answer(self.request_hash(for_user=self.cache_method == "user"))

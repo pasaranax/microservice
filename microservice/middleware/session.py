@@ -47,7 +47,7 @@ def check(anonymous=True, roles=None):
                                     me["api_version"] = self.api_version
                                 await method(self, me, *args, **kwargs)
                             self.send_result()
-                            if self.cache_lifetime > 0:
+                            if self.cache_method is not None:
                                 await self.cache.store_request(self.request_hash(for_user=self.cache_method == "user"), self.cache_lifetime, self.answer.answer)
                         except InternalError as e:
                             self.compose(error=str(e), send=True)
