@@ -134,20 +134,21 @@ class BasicHandler(SentryMixinExt, RequestHandler):
         self.endpoint = re.sub("\d", "", "/".join(self.request.uri.split("?")[0].split("/")[2:])).rstrip("/")
 
         # Caching: if cache found don't call method, just return cached answer
-        hash_exists = await self.cache.check_request(self.request_hash(for_user=self.cache_method == "user"))
-        if hash_exists:
-            restored_answer = await self.cache.restore_answer(self.request_hash(for_user=self.cache_method == "user"))
-            logging.info(self.request_hash(for_user=self.cache_method == "user"))
-            logging.info("hash exists, answer is: {}".format(restored_answer))
-            if restored_answer == "":
-                self.compose(error="#duplicate_request Request in progress", send=True)
+        if self.cache_lifetime > 0:
+            hash_exists = await self.cache.check_request(self.request_hash(for_user=self.cache_method == "user"))
+            if hash_exists:
+                restored_answer = await self.cache.restore_answer(self.request_hash(for_user=self.cache_method == "user"))
+                logging.info(self.request_hash(for_user=self.cache_method == "user"))
+                logging.info("hash exists, answer is: {}".format(restored_answer))
+                if restored_answer == "":
+                    self.compose(error="#duplicate_request Request in progress", send=True)
+                else:
+                    self.answer.answer = restored_answer
+                    self.cached = True
+                    self.send_result()
             else:
-                self.answer.answer = restored_answer
-                self.cached = True
-                self.send_result()
-        else:
-            await self.cache.store_request(self.request_hash(for_user=self.cache_method == "user"), self.cache_lifetime, "")
-            self.init()
+                await self.cache.store_request(self.request_hash(for_user=self.cache_method == "user"), self.cache_lifetime, "")
+        self.init()
 
     async def get(self, **kwargs):
         self.compose(error="#method_not_allowed", status=405, send=True)
