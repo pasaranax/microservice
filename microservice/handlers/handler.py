@@ -13,7 +13,6 @@ from urllib.parse import unquote
 
 from raven.contrib.tornado import SentryMixin
 from telebot.apihelper import ApiException
-from tornado import gen
 from tornado.escape import json_decode
 from tornado.netutil import is_valid_ip
 from tornado.web import RequestHandler
@@ -138,8 +137,6 @@ class BasicHandler(SentryMixinExt, RequestHandler):
             hash_exists = await self.cache.check_request(self.request_hash(for_user=self.cache_method == "user"))
             if hash_exists:
                 restored_answer = await self.cache.restore_answer(self.request_hash(for_user=self.cache_method == "user"))
-                logging.info(self.request_hash(for_user=self.cache_method == "user"))
-                logging.info("hash exists, answer is: {}".format(restored_answer))
                 if restored_answer == "":
                     self.compose(error="#duplicate_request Request in progress", send=True)
                 else:
@@ -220,14 +217,18 @@ class BasicHandler(SentryMixinExt, RequestHandler):
             self.finish(self.answer.dict())
 
     def make_log(self):
-        log_record = "{}: ({}) {} {} [{}] {} ms".format(
+        log_record = "{}: ({}) {} {} [{}] {} ms {}".format(
             self.get_status(), self.request.remote_ip, self.request.method, unquote(self.request.uri),
-            self.request.headers.get("User-Agent", ""), self.answer.mark_time()
+            self.request.headers.get("User-Agent", ""), self.answer.mark_time(), "cached" if self.cached else "\b"
         )
         if self.session.user is not None:
             log_record = "{} (token: {}, {}: {} {})".format(
                 log_record, self.request.headers.get("X-Token"),
                 self.session.user["id"], self.session.user["first_name"] or self.session.user["email"], self.session.user["last_name"] or "\b",
+            )
+        elif self.request.headers.get("X-Token"):
+            log_record = "{} (token: {})".format(
+                log_record, self.request.headers.get("X-Token")
             )
         return log_record
 

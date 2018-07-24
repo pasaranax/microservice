@@ -1,5 +1,4 @@
 import json
-import logging
 
 from microservice.middleware.objects import BasicObject
 
