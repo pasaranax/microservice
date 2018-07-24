@@ -9,18 +9,15 @@ class RedisCache:
         self.redis = redis_connection
 
     async def store_request(self, request_hash, expire, value):
-        logging.info("storing request")
         data = json.dumps(value)
         await self.redis.setex("request.{}".format(request_hash), expire, data)
 
     async def restore_answer(self, request_hash):
-        logging.info("restoring answer")
         data = await self.redis.get("request.{}".format(request_hash))
         answer = json.loads(data)
         return answer
 
     async def check_request(self, request_hash):
-        logging.info("checking request")
         return await self.redis.exists("request.{}".format(request_hash))
 
     async def set(self, key, expire=0, value=None):
