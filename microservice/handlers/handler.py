@@ -4,6 +4,7 @@ import json
 import logging
 import re
 import traceback
+from hashlib import sha1
 from base64 import b64decode
 from concurrent.futures import ThreadPoolExecutor
 from json import JSONDecodeError
@@ -22,6 +23,7 @@ from microservice.exceptions import ApiError
 from microservice.functions import TelegramReporter
 from microservice.metrics import Metrics
 from microservice.middleware.session import Session
+from microservice.middleware.cache import RedisCache
 
 
 class Answer:
@@ -86,11 +88,15 @@ class SentryMixinExt(SentryMixin):
 class BasicHandler(SentryMixinExt, RequestHandler):
     executor = ThreadPoolExecutor(max_workers=cfg.app.max_workers_on_executor)
     session_class = None
+    cache_method = "user"
+    cache_lifetime = 10
 
     def get_session_class(self):
         return self.session_class or Session
 
     def initialize(self):
+        self.cache = RedisCache(self.application.redis_connection)
+        self.cached = False
         self.answer = Answer()
         forwarded_ip = self.request.headers.get("X-Forwarded-For", self.request.remote_ip)
         if is_valid_ip(forwarded_ip):
@@ -105,7 +111,7 @@ class BasicHandler(SentryMixinExt, RequestHandler):
         """Redefine this method instead of self.initialize()"""
         pass
 
-    def prepare(self, *kwargs):
+    async def prepare(self, *kwargs):
         """
         Выполняется перед  обработкой запроса
         """
@@ -126,7 +132,22 @@ class BasicHandler(SentryMixinExt, RequestHandler):
         except ValueError:
             self.api_version = 0
         self.endpoint = re.sub("\d", "", "/".join(self.request.uri.split("?")[0].split("/")[2:])).rstrip("/")
-        self.init()
+
+        # Caching: if cache found don't call method, just return cached answer
+        hash_exists = await self.cache.check_request(self.request_hash(for_user=self.cache_method == "user"))
+        if hash_exists:
+            restored_answer = await self.cache.restore_answer(self.request_hash(for_user=self.cache_method == "user"))
+            logging.info(self.request_hash(for_user=self.cache_method == "user"))
+            logging.info("hash exists, answer is: {}".format(restored_answer))
+            if restored_answer == "":
+                self.compose(error="#duplicate_request Request in progress", send=True)
+            else:
+                self.answer.answer = restored_answer
+                self.cached = True
+                self.send_result()
+        else:
+            await self.cache.store_request(self.request_hash(for_user=self.cache_method == "user"), self.cache_lifetime, "")
+            self.init()
 
     async def get(self, **kwargs):
         self.compose(error="#method_not_allowed", status=405, send=True)
@@ -209,7 +230,6 @@ class BasicHandler(SentryMixinExt, RequestHandler):
             )
         return log_record
 
-    @gen.coroutine
     def on_finish(self):
         """
         Выполняется после отправки ответа
@@ -328,3 +348,14 @@ class BasicHandler(SentryMixinExt, RequestHandler):
 
     def drop_nones(self, d, required=None):
         return {k: v for k, v in d.items() if v is not None or (required and k in required)}
+
+    def request_hash(self, for_user=False):
+        s = "{}.{}.{}.{}.{}".format(
+            self.request.method,
+            self.request.uri,
+            self.request.headers.get("X-Token", "") if for_user else "",
+            self.request.body,
+            cfg.app.secret_key
+        )
+        hash = sha1(s.encode("utf-8"))
+        return hash.hexdigest()

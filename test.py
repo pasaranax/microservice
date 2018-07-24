@@ -1,3 +1,5 @@
+import asyncio
+
 from microservice.middleware.objects import BasicObject, Collection
 
 from microservice import Server, BasicHandler, check, Data
@@ -21,7 +23,7 @@ class TestValidator(BasicObject):
 
 
 class TestHandler_v1(BasicHandler):
-    @check()
+    @check(anonymous=True, cache_method="user", cache_lifetime=15)
     async def get(self, me):
         result = Collection([
             {
@@ -42,6 +44,7 @@ class TestHandler_v1(BasicHandler):
                 "lang": "en"
             }
         ], TestValidator)
+        await asyncio.sleep(5)
         data = Data(result=result)
         self.compose("Hello", data)
 

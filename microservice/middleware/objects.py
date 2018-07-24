@@ -180,6 +180,7 @@ class Collection(UserList, SerializableMixin):
 
     @classmethod
     def with_class(cls, object_class_=None):
+        """Return new class"""
         class TypedCollection(Collection):
             object_class = object_class_ or BasicObject
         logging.debug("Redefined class in collection: {} (Collection id {}), original: {} (Collection id {})".format(TypedCollection.object_class, id(TypedCollection), cls.object_class, id(cls)))

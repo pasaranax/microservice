@@ -1,6 +1,7 @@
 import logging
 from traceback import print_exc
 
+import aioredis
 from raven.contrib.tornado import AsyncSentryClient
 
 import cfg
@@ -20,7 +21,6 @@ class Server:
         AsyncIOMainLoop().install()
         self.loop = asyncio.get_event_loop()
 
-        self.sentry_client = AsyncSentryClient(cfg.app.sentry_url)
         self.router = Router(handlers)
         self.app = Application(self.router.routes, **cfg.app.tornado_settings)
         self.app.loop = self.loop
@@ -31,7 +31,8 @@ class Server:
         else:
             self.app.objects = None
 
-        self.app.sentry_client = self.sentry_client
+        self.app.sentry_client = AsyncSentryClient(cfg.app.sentry_url)
+        self.app.redis_connection = self.loop.run_until_complete(aioredis.create_redis((cfg.redis.host, cfg.redis.port)))
 
     def run(self):
         try:

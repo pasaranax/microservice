@@ -21,5 +21,6 @@ setup(
         "urllib3==1.22",
         "google-auth==1.5.0",
         "pytz==2018.5",
+        "aioredis==1.1.0",
     ]
 )

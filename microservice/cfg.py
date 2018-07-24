@@ -4,6 +4,11 @@ import time
 from logging.config import dictConfig
 
 
+class redis:
+    host = os.getenv("REDIS_HOST", "localhost")
+    port = os.getenv("REDIS_PORT", "6379")
+
+
 class app:
     debug = bool(os.getenv("DEBUG", True))
     port = 8001
@@ -33,21 +38,17 @@ class app:
 
     push_android_api_key = "123"
 
-    oauth_networks = ["facebook", "google", "vk"]
-
-    telegram_secret = "another random string"
-
     sentry_url = os.getenv("SENTRY_URL")
     send_telegram_errors = True
     telegram_reporter = {
-        "unknown": {
+        "unknown": {  # hostname
             "chat_id": "-123",
             "name": "Unknown Host",
         },
     }
-    telegram_bot_token = "275781311:AAGubGsn8jgqAyVEdm53NoyepC4H-XRlx1g"
+    telegram_bot_token = "123:lalala"
     telegram_bot_url = "https://api.telegram.org/" \
-                       "bot275781311:AAGubGsn8jgqAyVEdm53NoyepC4H-XRlx1g" \
+                       "bot123:lalala" \
                        "/sendMessage?chat_id={}&text={}"
 
     logging_config = {
