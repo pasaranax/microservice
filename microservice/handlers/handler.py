@@ -217,9 +217,9 @@ class BasicHandler(SentryMixinExt, RequestHandler):
             self.finish(self.answer.dict())
 
     def make_log(self):
-        log_record = "{}: ({}) {} {} [{}] {} ms {}".format(
+        log_record = "{}: ({}) {} {} [{}] {} ms".format(
             self.get_status(), self.request.remote_ip, self.request.method, unquote(self.request.uri),
-            self.request.headers.get("User-Agent", ""), self.answer.mark_time(), "cached" if self.cached else "\b"
+            self.request.headers.get("User-Agent", ""), self.answer.mark_time()
         )
         if self.session.user is not None:
             log_record = "{} (token: {}, {}: {} {})".format(
@@ -227,8 +227,8 @@ class BasicHandler(SentryMixinExt, RequestHandler):
                 self.session.user["id"], self.session.user["first_name"] or self.session.user["email"], self.session.user["last_name"] or "\b",
             )
         elif self.request.headers.get("X-Token"):
-            log_record = "{} (token: {})".format(
-                log_record, self.request.headers.get("X-Token")
+            log_record = "{} (token: {} {})".format(
+                log_record, self.request.headers.get("X-Token"), "From cache" if self.cached else "\b"
             )
         return log_record
 
