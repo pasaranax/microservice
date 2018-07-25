@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="microservice",
-    version="0.2.37",
+    version="0.2.38",
     description="Powerful REST API microservice on Tornado",
     url="https://git.phobos.work/mbulygin/microservice",
     author="Mikhail Bulygin",
@@ -16,7 +16,7 @@ setup(
         "pyTelegramBotAPI==3.6.3",
         "raven==6.9.0",
         "requests==2.18.4",
-        "tornado==5.0.2",
+        "tornado==5.1",
         "ua-parser==0.8.0",
         "urllib3==1.22",
         "google-auth==1.5.0",
