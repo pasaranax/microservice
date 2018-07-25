@@ -115,7 +115,7 @@ class BasicHandler(SentryMixinExt, RequestHandler):
         Выполняется перед  обработкой запроса
         """
         self.add_header('Access-Control-Allow-Origin', '*')
-        self.add_header('Access-Control-Allow-Headers', 'Content-Type, %s, X-Client-Type, Origin, '
+        self.add_header('Access-Control-Allow-Headers', 'Content-Type, %s, X-Client-Type, Origin, Cache-Control, '
                                                         'X-Requested-With, Accept' % self.get_session_class().auth_header)
         self.add_header('Access-Control-Allow-Methods', 'GET, POST, PATCH, PUT, DELETE, OPTIONS, HEAD')
         self.add_header('Access-Control-Allow-Credentials', 'true')
@@ -133,7 +133,7 @@ class BasicHandler(SentryMixinExt, RequestHandler):
         self.endpoint = re.sub("\d", "", "/".join(self.request.uri.split("?")[0].split("/")[2:])).rstrip("/")
 
         # Caching: if cache found don't call method, just return cached answer
-        if self.cache_method is not None:
+        if self.request.headers.get("Cache-Control") != "no-cache" and self.cache_method is not None:
             hash_exists = await self.cache.check_request(self.request_hash(for_user=self.cache_method == "user"))
             if hash_exists:
                 restored_answer = await self.cache.restore_answer(self.request_hash(for_user=self.cache_method == "user"))
