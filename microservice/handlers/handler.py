@@ -199,9 +199,9 @@ class BasicHandler(SentryMixinExt, RequestHandler):
             self.set_status(status or 400)
             self.answer.compose(message=None, error={"code": code, "message": error_message})
             Metrics.errors_4xx.inc(1)
-            self.captureMessage(code, level=logging.WARNING, extra={
-                "message": error_message,
-                "body": self.body()
+            self.captureMessage(error, level=logging.WARNING, extra={
+                "cached": self.cached,
+                "log": self.make_log()
             })
         else:
             self.set_status(status or 200)
