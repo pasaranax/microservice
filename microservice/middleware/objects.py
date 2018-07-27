@@ -77,6 +77,10 @@ class BasicObject(UserDict, SerializableMixin):
         self.data[key] = value
         setattr(self, key, value)
 
+    def __delitem__(self, key):
+        del self.data[key]
+        delattr(self, key)
+
     def validate(self):
         """implement it otherwise self.data will be filled from self.input directly"""
         self.data = self.input
@@ -142,6 +146,15 @@ class BasicObject(UserDict, SerializableMixin):
             if self[key] != other.get(key):
                 res[key] = self[key]
         return res
+
+    def drop_nones(self, required=None):
+        clear = {}
+        for k, v in self.items():
+            if v is not None or (required and k in required):
+                clear[k] = v
+            else:
+                delattr(self, k)
+        self.data = BasicObject(clear)
 
 
 class Collection(UserList, SerializableMixin):
