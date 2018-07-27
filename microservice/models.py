@@ -1,6 +1,5 @@
 import asyncio
 
-import aioredis
 from peewee_asyncext import PooledPostgresqlExtDatabase
 
 from microservice.middleware.objects import BasicObject
@@ -17,9 +16,6 @@ connection = PooledPostgresqlExtDatabase(
     password=cfg.db.password,
     register_hstore=False
 )
-
-loop = asyncio.get_event_loop()
-redis = loop.run_until_complete(aioredis.create_redis((cfg.redis.host, cfg.redis.port)))
 
 
 class BasicModel(Model):

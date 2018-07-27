@@ -32,7 +32,11 @@ class Server:
             self.app.objects = None
 
         self.app.sentry_client = AsyncSentryClient(cfg.app.sentry_url)
-        self.app.redis_connection = self.loop.run_until_complete(aioredis.create_redis((cfg.redis.host, cfg.redis.port)))
+        try:
+            import aioredis
+            self.app.redis_connection = self.loop.run_until_complete(aioredis.create_redis((cfg.redis.host, cfg.redis.port)))
+        except (ImportError, OSError):
+            self.app.redis_connection = None
 
     def run(self):
         try:

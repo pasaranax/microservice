@@ -94,7 +94,10 @@ class BasicHandler(SentryMixinExt, RequestHandler):
         return self.session_class or Session
 
     def initialize(self):
-        self.cache = RedisCache(self.application.redis_connection)
+        if self.application.redis_connection:
+            self.cache = RedisCache(self.application.redis_connection)
+        else:
+            self.cache = None
         self.cached = False
         self.answer = Answer()
         forwarded_ip = self.request.headers.get("X-Forwarded-For", self.request.remote_ip)
@@ -133,7 +136,7 @@ class BasicHandler(SentryMixinExt, RequestHandler):
         self.endpoint = re.sub("\d", "", "/".join(self.request.uri.split("?")[0].split("/")[2:])).rstrip("/")
 
         # Caching: if cache found don't call method, just return cached answer
-        if self.request.headers.get("Cache-Control") != "no-cache" and self.cache_method is not None:
+        if self.cache and self.request.headers.get("Cache-Control") != "no-cache" and self.cache_method:
             hash_exists = await self.cache.check_request(self.request_hash(for_user=self.cache_method == "user"))
             if hash_exists:
                 restored_answer = await self.cache.restore_answer(self.request_hash(for_user=self.cache_method == "user"))
