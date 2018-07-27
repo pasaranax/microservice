@@ -1,18 +1,14 @@
+import asyncio
 import logging
 from traceback import print_exc
 
-import aioredis
-from raven.contrib.tornado import AsyncSentryClient
-
 import cfg
-from microservice.routes import Router
-
-
-import asyncio
-from tornado.web import Application
-from tornado.platform.asyncio import AsyncIOMainLoop
-
 import peewee_async
+from raven.contrib.tornado import AsyncSentryClient
+from tornado.platform.asyncio import AsyncIOMainLoop
+from tornado.web import Application
+
+from microservice.routes import Router
 
 
 class Server:
