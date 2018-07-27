@@ -1,3 +1,5 @@
+from peewee import DoesNotExist
+
 from microservice.managers.manager import DataManager
 from microservice.models import Social
 
@@ -19,7 +21,10 @@ class SocialManager(DataManager):
         return social
 
     async def read(self, network, social_id):
-        res = await self.obj.get(Social, network=network, social_id=social_id)
-        if res:
+        try:
+            res = await self.obj.get(Social, network=network, social_id=social_id)
+        except DoesNotExist:
+            return None
+        else:
             social = res.object()
             return social
