@@ -44,6 +44,6 @@ class Server:
             logging.info("Server stopped")
         except:
             print_exc()
-            self.sentry_client.captureException()
+            self.app.sentry_client.captureException()
             logging.error("Server crashed!")
             exit(1)
