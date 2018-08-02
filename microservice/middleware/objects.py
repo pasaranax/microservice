@@ -1,7 +1,6 @@
 import json
 import logging
 from collections import UserDict, UserList
-from copy import copy, deepcopy
 
 from microservice.exceptions import ApiError, CriticalError
 
@@ -168,7 +167,7 @@ class Collection(UserList, SerializableMixin):
             self.valid = True
         else:
             self.valid = False
-            # logging.warning("Collection object class is not set: {}".format(__name__))
+            self.set_class(BasicObject)
         self._ix = None
 
     def set_class(self, object_class):
@@ -178,6 +177,9 @@ class Collection(UserList, SerializableMixin):
 
     @property
     def ix(self):
+        """
+        Need id of items
+        """
         if not self._ix and len(self) > 0 and self[0].get("id"):
             self._ix = {v["id"]: v for v in self}
         return self._ix
@@ -207,3 +209,31 @@ class Collection(UserList, SerializableMixin):
         """
         for item in self.data:
             item.group_enum(enum_name, variants)
+
+    def search(self, case_insensitive=True, method="and", **kwargs):
+        """
+        Search and return filtered collection with linked objects
+        :param case_insensitive: only if value is str
+        :param method: and/or
+        :param kwargs: filters
+        :return: Collection
+        """
+        results = Collection([])
+        for item in self:
+            match = 0
+            for key, value in kwargs.items():
+                if item[key] == value or (case_insensitive and isinstance(item[key], str) and str(item[key]).lower() == str(value).lower()):
+                    match += 1
+            if method == "and" and match == len(kwargs):
+                results.append(item)
+            elif method == "or" and match > 0:
+                results.append(item)
+        return results
+
+
+if __name__ == '__main__':
+    a = Collection([])
+    a.append({"a": "a", "b": "b"})
+    a.append({"a": 1, "b": "2"})
+    a.append({"a": "a", "b": "b"})
+    print(a.search(a=1, b="2", method="and"))
