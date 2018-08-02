@@ -46,8 +46,7 @@ def check(anonymous=True, roles=None):
                                     me["sentry_client"] = self.application.sentry_client
                                     me["api_version"] = self.api_version
                                 await method(self, me, *args, **kwargs)
-                            self.send_result()
-                            if self.cache_method is not None:
+                            if self.cache is not None and self.cache_method is not None:
                                 await self.cache.store_request(self.request_hash(for_user=self.cache_method == "user"), self.cache_lifetime, self.answer.answer)
                         except InternalError as e:
                             self.compose(error=str(e), send=True)
@@ -58,6 +57,8 @@ def check(anonymous=True, roles=None):
                         except (QueryCanceledError, CancelledError) as e:
                             self.capture_exception()
                             self.compose(error="#db_error query cancelled: {}".format(e), status=500, send=True)
+                        else:
+                            self.send_result()
                 try:  # handle db errors
                     return await self.loop.create_task(task(self, *args, **kwargs))
                 except (peewee.OperationalError, psycopg2.OperationalError, peewee.InternalError, peewee.InterfaceError) as e:

@@ -98,6 +98,7 @@ class BasicHandler(SentryMixinExt, RequestHandler):
             self.cache = RedisCache(self.application.redis_connection)
         else:
             self.cache = None
+            self.cache_method = None
         self.cached = False
         self.answer = Answer()
         forwarded_ip = self.request.headers.get("X-Forwarded-For", self.request.remote_ip)
