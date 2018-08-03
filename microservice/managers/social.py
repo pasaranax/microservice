@@ -28,3 +28,10 @@ class SocialManager(DataManager):
         else:
             social = res.object()
             return social
+
+    async def delete(self, user, network):
+        await self.obj.execute(Social.raw("""
+            DELETE FROM social
+            WHERE user_id = %s and network = %s
+            RETURNING 1
+        """, user.id, network))
