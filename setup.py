@@ -13,7 +13,7 @@ setup(
         "peewee==2.10.2",
         "peewee-async==0.5.12",
         "prometheus-client==0.3.0",
-        "pyTelegramBotAPI==3.6.3",
+        "pyTelegramBotAPI==3.6.5",
         "raven==6.9.0",
         "requests==2.18.4",
         "tornado==5.1",
