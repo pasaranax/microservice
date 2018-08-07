@@ -58,6 +58,11 @@ class SerializableMixin:
 class BasicObject(UserDict, SerializableMixin):
     def __init__(self, item_dict: dict, obj=None):
         super(BasicObject, self).__init__()  # empty until validated
+        for key in item_dict:  # protect system fields
+            if key in ["data"]:
+                item_dict[key + "_"] = item_dict[key]
+                del item_dict[key]
+
         self.input = item_dict
         self.validate()
         # after this moment self.data is validated and may be converted to object fields
