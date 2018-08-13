@@ -44,9 +44,15 @@ class SerializableMixin:
         elif isinstance(self, Collection):
             return json.dumps(self.list())
 
-    @classmethod
-    def from_json(cls, s):
-        return cls(json.loads(s))
+    @staticmethod
+    def from_json(s):
+        o = json.loads(s)
+        if isinstance(o, list):
+            return Collection(o)
+        elif isinstance(o, dict):
+            return BasicObject(o)
+        else:
+            return o
 
     def __repr__(self):
         return self.json()
