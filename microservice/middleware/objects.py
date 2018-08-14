@@ -195,14 +195,18 @@ class Collection(UserList, SerializableMixin):
             self._ix = {v["id"]: v for v in self}
         return self._ix
 
-    def join(self, children, foreign_key, group_name):
+    def join(self, children, foreign_key, group_name, how="many"):
+        assert how in ("many", "one")
         for i in self.data:
-            i[group_name] = []
+            i[group_name] = [] if how == "many" else None
         for child in children:
             try:
-                self.ix[child[foreign_key]][group_name].append(child)
+                if how == "many":
+                    self.ix[child[foreign_key]][group_name].append(child)
+                elif how == "one":
+                    self.ix[child[foreign_key]][group_name] = child
             except KeyError:
-                logging.error("Lost object index: {} id {}".format(foreign_key, child[foreign_key]))
+                logging.debug("Lost object index: {} id {}".format(foreign_key, child[foreign_key]))
 
     @classmethod
     def with_class(cls, object_class_=None):
