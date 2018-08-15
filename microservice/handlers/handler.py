@@ -192,7 +192,7 @@ class BasicHandler(SentryMixinExt, RequestHandler):
             logging.warning("Error: '{}'. Body: {}".format(error, self.body()))
             # Статус из хештегов
             if not status:
-                if code in ("#auth", "#oauth", "#access_denied"):
+                if code in ("#auth", "#oauth", "#access_denied", "#wrong_password"):
                     status = 401
                 elif code == "#not_found":
                     status = 404
