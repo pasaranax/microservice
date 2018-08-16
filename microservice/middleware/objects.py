@@ -1,6 +1,8 @@
+import datetime
 import json
 import logging
 from collections import UserDict, UserList
+from datetime import datetime
 
 from microservice.exceptions import ApiError, CriticalError
 
@@ -34,6 +36,8 @@ class SerializableMixin:
                 raw_dict[k] = self.dict(v)
             elif isinstance(v, list):
                 raw_dict[k] = self.list(v)
+            elif isinstance(v, datetime):
+                raw_dict[k] = v.isoformat("T")
             else:
                 raw_dict[k] = v
         return raw_dict
@@ -179,7 +183,7 @@ class Collection(UserList, SerializableMixin):
         else:
             self.valid = False
             self.set_class(BasicObject)
-        self._ix = None
+        self._ix = {}
 
     def set_class(self, object_class):
         self.object_class = object_class
@@ -206,7 +210,8 @@ class Collection(UserList, SerializableMixin):
                 elif how == "one":
                     self.ix[child[foreign_key]][group_name] = child
             except KeyError:
-                logging.debug("Lost object index: {} id {}".format(foreign_key, child[foreign_key]))
+                pass
+                # logging.debug("Lost object index: {} id {}".format(foreign_key, child[foreign_key]))
 
     @classmethod
     def with_class(cls, object_class_=None):

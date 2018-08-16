@@ -12,7 +12,7 @@ class Router:
         """
         self.handlers = handlers
         self.min_version = 1  # минимальная поддерживаемая версия
-        self.latest = 1  # latest actual api version
+        self.latest = 99  # latest actual api version
         self._routes = []
 
     def gen_url(self, v, endpoint, handler):
