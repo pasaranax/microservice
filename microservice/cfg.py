@@ -47,9 +47,6 @@ class app:
         },
     }
     telegram_bot_token = "123:lalala"
-    telegram_bot_url = "https://api.telegram.org/" \
-                       "bot123:lalala" \
-                       "/sendMessage?chat_id={}&text={}"
 
     logging_config = {
         "version": 1,
