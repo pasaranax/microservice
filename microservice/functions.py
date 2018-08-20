@@ -6,6 +6,7 @@ import socket
 from email.mime.text import MIMEText
 from hashlib import md5
 from smtplib import SMTP_SSL
+from time import perf_counter as pc
 
 import requests
 from telebot import TeleBot
@@ -138,3 +139,17 @@ def check_atomic(obj):
         return obj.atomic()
     else:
         return DummyAtomic()
+
+
+class Timer:
+    def __init__(self):
+        self.start_time = pc()
+        self.mark = pc()
+        self.counter = 0
+
+    def step(self, step="Step"):
+        from_prev = pc() - self.mark
+        from_start = pc() - self.start_time
+        logging.debug("Step {} {}: {:.3f} from prev step, {:.3f} from start".format(self.counter, step, from_prev*1000, from_start*1000))
+        self.mark = pc()
+        self.counter += 1
