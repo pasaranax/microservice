@@ -4,7 +4,7 @@ setup(
     name="microservice",
     version="0.2.40",
     description="Powerful REST API microservice on Tornado",
-    url="https://git.phobos.work/mbulygin/microservice",
+    url="https://github.com/pasaranax/microservice",
     author="Mikhail Bulygin",
     packages=find_packages(),
     install_requires=[
