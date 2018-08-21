@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="microservice",
-    version="0.2.40",
+    version="0.3.0",
     description="Powerful REST API microservice on Tornado",
     url="https://github.com/pasaranax/microservice",
     author="Mikhail Bulygin",
