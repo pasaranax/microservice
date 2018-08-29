@@ -57,9 +57,9 @@ def check(anonymous=True, roles=None):
                         except (QueryCanceledError, CancelledError) as e:
                             self.captureException()
                             self.compose(error="#db_error query cancelled: {}".format(e), status=500, send=True)
-                        except Exception:
+                        except Exception as e:
                             print_exc()
-                            self.captureException()
+                            raise e
                         else:
                             self.send_result()
                 try:  # handle db errors
