@@ -4,6 +4,8 @@ setup(
     name="microservice",
     version="0.3.1",
     description="Powerful REST API microservice on Tornado",
+    long_description=open("README.md").read(),
+    long_description_content_type="text/markdown",
     url="https://github.com/pasaranax/microservice",
     author="Mikhail Bulygin",
     author_email="pasaranax@gmail.com",
