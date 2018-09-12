@@ -10,11 +10,12 @@ setup(
     packages=find_packages(),
     classifiers=[
         'Development Status :: 4 - Beta',
-        'Intended Audience :: Backend',
+        'Topic :: Internet :: WWW/HTTP :: HTTP Servers',
+        'Intended Audience :: Developers',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
-        'License :: OSI Approved :: LGPL License'
+        'License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)'
     ],
     install_requires=[
         "aiopg==0.13.2",
