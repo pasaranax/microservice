@@ -2,11 +2,20 @@ from setuptools import setup, find_packages
 
 setup(
     name="microservice",
-    version="0.3.0",
+    version="0.3.1",
     description="Powerful REST API microservice on Tornado",
     url="https://github.com/pasaranax/microservice",
     author="Mikhail Bulygin",
+    author_email="pasaranax@gmail.com",
     packages=find_packages(),
+    classifiers=[
+        'Development Status :: 4 - Beta',
+        'Intended Audience :: Backend',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'License :: OSI Approved :: LGPL License'
+    ],
     install_requires=[
         "aiopg==0.13.2",
         "oauth2==1.9.0.post1",

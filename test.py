@@ -1,4 +1,8 @@
 import asyncio
+from threading import Thread
+from time import sleep
+
+import requests
 
 from microservice.middleware.objects import BasicObject, Collection
 
@@ -23,7 +27,10 @@ class TestValidator(BasicObject):
 
 
 class TestHandler_v1(BasicHandler):
-    @check(anonymous=True, cache_method="user", cache_lifetime=15)
+    cache_method = "user"
+    cache_lifetime = 15
+
+    @check(anonymous=True)
     async def get(self, me):
         result = Collection([
             {

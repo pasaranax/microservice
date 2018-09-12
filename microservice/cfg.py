@@ -36,8 +36,6 @@ class app:
     send_email_errors = False
     errors_email = "contact@example.com"
 
-    push_android_api_key = "123"
-
     sentry_url = os.getenv("SENTRY_URL")
     send_telegram_errors = True
     telegram_reporter = {
