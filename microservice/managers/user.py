@@ -35,7 +35,7 @@ class UserManager(DataManager):
         )
         if not created:
             raise InternalError("#auth #registration #field login already taken")
-        user = BasicObject(user_obj.dict())
+        user = user_obj.object()
         return user
 
     async def oauth(self, user_data):
@@ -48,7 +48,7 @@ class UserManager(DataManager):
             login=user_data["login"],
             defaults=user_data
         )
-        user = user_obj.dict()
+        user = user_obj.object()
         return user, created
 
     async def read(self, user_id=None, login=None, password=None, email=None, network=None):
@@ -130,7 +130,7 @@ class UserManager(DataManager):
             #     cfg.app.recovery_text.format(user_obj.code),
             #     cfg.app.recovery_subject
             # )
-            user = user_obj.dict()
+            user = user_obj.object()
         return user
 
     async def confirm(self, code, password=None):
@@ -149,7 +149,7 @@ class UserManager(DataManager):
                 user_obj.password_hash = self.hash(password)
             user_obj.status = "active"
             await self.obj.update(user_obj)
-            user = user_obj.dict()
+            user = user_obj.object()
         return user
 
     async def check(self, login=None, email=None):
