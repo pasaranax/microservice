@@ -35,7 +35,7 @@ class UserManager(DataManager):
         )
         if not created:
             raise InternalError("#auth #registration #field login already taken")
-        user = user_obj.dict()
+        user = BasicObject(user_obj.dict())
         return user
 
     async def oauth(self, user_data):
