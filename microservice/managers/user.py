@@ -88,19 +88,13 @@ class UserManager(DataManager):
         user_obj = await self.obj.get(self.model, id=user_data["id"])
         user = user_obj.object()
         if isinstance(user_data, BasicObject):
-            user_data -= user
-        # protected_fields = ["email", "phone", "new_password"]
-        # need_password = False
-        # for field in protected_fields:
-        #     if field in user_data and user_data.get(field) is not None:
-        #         need_password = True
+            user_data -= user  # prevent rewrite, just update
 
-        # if need_password:
-        #     if self.hash(user_data.get("old_password")) == user["password_hash"]:
         if user_data.get("new_password"):
             user_data["password_hash"] = self.hash(user_data["new_password"])
-            # else:
-            #     raise ApiError("#missing Need password to change registration data")
+        if user_data.get("email"):
+            user_data["login"] = user_data["email"]
+            user_data["reg_method"] = "email"
 
         # изменение данных
         try:
