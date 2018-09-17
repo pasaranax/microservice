@@ -102,7 +102,10 @@ class UserManager(DataManager):
             user_obj = self.model.from_dict(user, ignore_unknown=True)
             await self.obj.update(user_obj)
         except IntegrityError:
-            raise InternalError("#email_not_available Error when updating registration data")
+            if user_data.get("email"):
+                raise InternalError("#email_not_available Error when updating registration data")
+            else:
+                raise InternalError("#foreign_key_error Error when updating registration data")
 
         return user
 
