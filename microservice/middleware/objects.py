@@ -110,7 +110,10 @@ class BasicObject(UserDict, SerializableMixin):
         :param required: set True if field is required
         :param allow_none: set True if param may be None, else None values will be removed
         """
-        value = self.input.get(name, default)
+        if name in self.input:
+            value = self.input.get(name, default)
+        else:
+            return
         if required and value in (None, ""):
             raise ApiError("#missing #field '{}' {}".format(name, error))
         if value is None:
