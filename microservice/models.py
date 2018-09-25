@@ -1,4 +1,5 @@
 import asyncio
+import enum
 
 from peewee_asyncext import PooledPostgresqlExtDatabase
 
@@ -73,7 +74,7 @@ class User(BasicModel):
     last_name = CharField(null=True)
     role = CharField(null=True, default="user")
     picture = JSONField(null=True)
-    status = CharField(default="disabled")
+    status = CharField(default="unconfirmed")
     code = CharField(null=True)
     rating = DoubleField(default=0)
     reg_method = CharField(null=True)

@@ -4,9 +4,10 @@ from os import urandom
 
 from peewee import DoesNotExist, IntegrityError
 
+import cfg
 from microservice import BasicObject
 from microservice.exceptions import InternalError, ApiError
-from microservice.functions import gravatar
+from microservice.functions import gravatar, send_mail
 from microservice.managers.manager import DataManager
 from microservice.models import User
 
@@ -26,7 +27,7 @@ class UserManager(DataManager):
             password_hash=self.hash(user_data["password"]) if user_data["password"] else None,
             code=sha1(urandom(16)).hexdigest() if user_data["reg_method"] else None,
             registration_date=datetime.now(),
-            status="disabled",
+            status="unconfirmed",
         )
         user_obj, created = await self.obj.get_or_create(
             self.model,
@@ -117,18 +118,11 @@ class UserManager(DataManager):
         try:
             user_obj = await self.obj.get(self.model, email=email)
         except DoesNotExist:
-            user = None
+            raise InternalError("#not_found email not found")
         else:
             user_obj.code = sha1(urandom(16)).hexdigest()
-            user_obj.status = "recovery"
             await self.obj.update(user_obj)
-            # await send_mail(
-            #     email,
-            #     cfg.app.recovery_text.format(user_obj.code),
-            #     cfg.app.recovery_subject
-            # )
-            user = user_obj.object()
-        return user
+        return user_obj.code
 
     async def confirm(self, code, password=None):
         """
@@ -139,15 +133,13 @@ class UserManager(DataManager):
         try:
             user_obj = await self.obj.get(self.model, code=code)
         except DoesNotExist:
-            user = None
+            raise InternalError("#wrong_code Wrong code")
         else:
             user_obj.code = None
             if password:
                 user_obj.password_hash = self.hash(password)
-            user_obj.status = "active"
+            user_obj.status = "confirmed"
             await self.obj.update(user_obj)
-            user = user_obj.object()
-        return user
 
     async def check(self, login=None, email=None):
         """
