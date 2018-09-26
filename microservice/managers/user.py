@@ -94,6 +94,8 @@ class UserManager(DataManager):
         if user_data.get("new_password"):
             user_data["password_hash"] = self.hash(user_data["new_password"])
         if user_data.get("email"):
+            user_data["code"] = sha1(urandom(16)).hexdigest()
+            user_data["status"] = "unconfirmed"
             user_data["login"] = user_data["email"]
             user_data["reg_method"] = "email"
 
@@ -108,7 +110,7 @@ class UserManager(DataManager):
             else:
                 raise InternalError("#foreign_key_error Error when updating user data")
 
-        return user
+        return user.code
 
     async def generate_code(self, email):
         """
