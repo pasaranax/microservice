@@ -36,12 +36,14 @@ class Answer:
         """
         self.t = pc() * 1000
         self.answer = {}
+        self.raw = None
 
-    def compose(self, message=None, data=None, error=None, meta=None):
+    def compose(self, message=None, data=None, error=None, meta=None, raw=None):
         """
         Необходимо вызвать для составления ответа
         """
-        assert message is not None or error is not None
+        assert message is not None or error is not None or raw is not None
+        self.raw = raw
         self.answer = {"message": message, "error": error, "data": data, "meta": meta}
 
     def dict(self):
@@ -57,6 +59,10 @@ class Answer:
         """
         self.answer["time"] = self.mark_time()
         return gzip.compress(json.dumps(self.answer).encode("utf-8"), compresslevel=cfg.app.gzip_output)
+
+    def raw_data(self):
+        self.answer["time"] = self.mark_time()
+        return self.raw
 
     def mark_time(self):
         """
@@ -173,7 +179,7 @@ class BasicHandler(SentryMixinExt, RequestHandler):
         self.set_status(204)
         self.finish()
 
-    def compose(self, message=None, result=None, error=None, status=None, send=False):
+    def compose(self, message=None, result=None, error=None, status=None, send=False, raw=None):
         """
         Сформировать ответ
         :param message: сообщение, которое выводится в случае отсутствия ошибки
@@ -212,13 +218,17 @@ class BasicHandler(SentryMixinExt, RequestHandler):
             if result:
                 result.meta.update(result.kwargs)
                 self.answer.compose(message, data=result.data, meta=result.meta)
+            elif raw:
+                self.answer.compose(raw=raw)
             else:
                 self.answer.compose(message)
         if send:
             self.send_result()
 
     def send_result(self):
-        if cfg.app.gzip_output > 0:
+        if self.answer.raw:
+            self.finish(self.answer.raw_data())
+        elif cfg.app.gzip_output > 0:
             self.set_header('Content-Encoding', 'gzip')
             self.finish(self.answer.gzip())
         else:
