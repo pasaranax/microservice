@@ -14,7 +14,7 @@ def migrate():
     """
     logging.info("Trying migrations")
     applied_migrations = [x.name for x in Migrations.select().order_by(Migrations.name).asc()]
-    last_migration = applied_migrations[-1]
+    last_migration = applied_migrations[-1] if len(applied_migrations) > 0 else "Database is empty"
     for loader, name, _ in pkgutil.walk_packages(migrations.__path__):
         if name not in applied_migrations:
             Migration = loader.find_module(name).load_module(name).Migration
