@@ -67,7 +67,7 @@ def check(anonymous=True, roles=None):
                 except (peewee.OperationalError, psycopg2.OperationalError, peewee.InternalError, peewee.InterfaceError) as e:
                     print_exc()
                     self.captureException()
-                    await self.on_finish()
+                    self.on_finish()
                     exit(1)
 
         return wrap
