@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="microservice",
-    version="0.3.5",
+    version="0.3.6",
     description="Powerful REST API microservice on Tornado",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
@@ -34,5 +34,6 @@ setup(
         "google-auth==1.5.0",
         "pytz==2018.5",
         "aioredis==1.1.0",
+        "asgiref==2.3.2"
     ]
 )

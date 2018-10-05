@@ -9,6 +9,7 @@ from smtplib import SMTP_SSL
 from time import perf_counter as pc
 
 import requests
+from asgiref.sync import sync_to_async
 from telebot import TeleBot
 
 import cfg
@@ -63,6 +64,11 @@ class TelegramReporter:
                 "<b>DB:</b> {} "
             ).format(message, TelegramReporter.host, TelegramReporter.addr, cfg.db.host)
         TelegramReporter.bot.send_message(chat_id, message, disable_web_page_preview=True, parse_mode="html")
+
+    @staticmethod
+    @sync_to_async
+    def send_async(chat_id, message, only_prod=False, ignore_tests=True, footer=False):
+        TelegramReporter.send_message(chat_id, message, only_prod=only_prod, ignore_tests=ignore_tests, footer=footer)
 
     @staticmethod
     def send_picture(chat_id, link):
