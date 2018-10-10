@@ -115,6 +115,7 @@ class BasicHandler(SentryMixinExt, RequestHandler):
         self.session = self.get_session_class()(self.request, self.body, self.args, self.application.objects)
         self.queue = []
         self.version = self.version if hasattr(self, "version") else 0
+        self.finished = False
 
     def init(self):
         """Redefine this method instead of self.initialize()"""
@@ -226,13 +227,15 @@ class BasicHandler(SentryMixinExt, RequestHandler):
             self.send_result()
 
     def send_result(self):
-        if self.answer.raw:
-            self.finish(self.answer.raw_data())
-        elif cfg.app.gzip_output > 0:
-            self.set_header('Content-Encoding', 'gzip')
-            self.finish(self.answer.gzip())
-        else:
-            self.finish(self.answer.dict())
+        if not self.finished:
+            if self.answer.raw:
+                self.finish(self.answer.raw_data())
+            elif cfg.app.gzip_output > 0:
+                self.set_header('Content-Encoding', 'gzip')
+                self.finish(self.answer.gzip())
+            else:
+                self.finish(self.answer.dict())
+            self.finished = True
 
     def make_log(self):
         log_record = "{}: ({}) {} {} [{}] {} ms".format(
