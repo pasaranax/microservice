@@ -113,7 +113,7 @@ class BasicObject(UserDict, SerializableMixin):
         value = self.input.get(name, default)
         if required and (value in (None, "") or name not in self.input):
             raise ApiError("#missing #field '{}' {}".format(name, error))
-        if name not in self.input:
+        if name not in self.input and default is None:
             return
         if value is None:
             value = default

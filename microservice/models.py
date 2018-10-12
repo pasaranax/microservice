@@ -1,13 +1,10 @@
-import asyncio
-import enum
-
-from peewee_asyncext import PooledPostgresqlExtDatabase
-
-from microservice.middleware.objects import BasicObject
 import cfg
 from peewee import Model, CharField, DoubleField, ForeignKeyField, PrimaryKeyField, DateTimeField, IntegerField, SQL
+from peewee_asyncext import PooledPostgresqlExtDatabase
 from playhouse.postgres_ext import JSONField
 from playhouse.shortcuts import model_to_dict, dict_to_model
+
+from microservice.middleware.objects import BasicObject
 
 connection = PooledPostgresqlExtDatabase(
     cfg.db.database,
@@ -26,7 +23,7 @@ class BasicModel(Model):
         database = connection
 
     def __str__(self):
-        if hasattr(self, "name"):
+        if self.get("name"):
             name = self.name
         else:
             name = self.id
