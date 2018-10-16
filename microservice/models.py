@@ -51,6 +51,7 @@ class BasicModel(Model):
 
     def object(self, recurse=False, **kwargs):
         obj = BasicObject(model_to_dict(self, recurse, **kwargs))
+        obj.model = self.__class__
         return obj
 
 

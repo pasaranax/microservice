@@ -135,6 +135,7 @@ class BasicObject(UserDict, SerializableMixin):
         """if object have id, it may be saved to db (o rly?)"""
         self.model = model
         self.obj = obj or self.obj
+        return self
 
     async def save(self):
         if not self.model or not self.obj:
