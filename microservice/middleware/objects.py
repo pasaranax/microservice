@@ -160,7 +160,7 @@ class BasicObject(UserDict, SerializableMixin):
         """return dict with fields which is differs in self and other"""
         res = BasicObject({})
         for key in self:
-            if self[key] != other.get(key):
+            if not other.get(key) or self[key] != other.get(key):
                 res[key] = self[key]
         return res
 
