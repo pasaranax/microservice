@@ -130,6 +130,7 @@ class BasicObject(UserDict, SerializableMixin):
         # final
         if value is not None or allow_none:
             self.data[name] = value
+            return value
 
     def set_model(self, model, obj=None):
         """if object have id, it may be saved to db (o rly?)"""
