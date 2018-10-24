@@ -22,8 +22,8 @@ setup(
     install_requires=[
         "aiopg>=0.13.2,<0.14",
         "oauth2>=1.9.0.post1,<1.10",
-        "peewee>=2.10.2,<2.11",
-        "peewee-async>=0.5.12",
+        "peewee>=2.10.2,<3",
+        "peewee-async>=0.5.12,<0.6",
         "prometheus-client>=0.3.0,<0.4",
         "pyTelegramBotAPI>=3.6.5,<3.7",
         "raven>=6.9.0,<6.10",
