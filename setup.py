@@ -33,7 +33,7 @@ setup(
         "urllib3>=1.22,<2",
         "google-auth>=1.5.0,<1.6",
         "pytz>=2018.5",
-        "aioredis>=1.1.0,<1.2",
+        "aioredis>=1.1.0,<2",
         "asgiref>=2.3.2,<2.4"
     ]
 )
