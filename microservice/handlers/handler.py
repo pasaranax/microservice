@@ -95,6 +95,7 @@ class BasicHandler(SentryMixinExt, RequestHandler):
     session_class = None
     cache_method = "user"  # "all", None
     cache_lifetime = 10
+    atomize = True  # every transaction creates atomic transaction in db
 
     def get_session_class(self):
         return self.session_class or Session

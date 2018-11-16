@@ -140,8 +140,8 @@ class DummyAtomic:
         pass
 
 
-def check_atomic(obj):
-    if obj:
+def check_atomic(obj, atomize=True):
+    if obj and atomize is True:
         return obj.atomic()
     else:
         return DummyAtomic()

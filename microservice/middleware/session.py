@@ -33,7 +33,7 @@ def check(anonymous=True, roles=None):
             """
             if not self.cached:
                 async def task(self, *args, **kwargs):
-                    async with check_atomic(self.application.objects):
+                    async with check_atomic(self.application.objects, self.atomize):
                         try:
                             me = await self.session.me()
                             if not (me or anonymous):
