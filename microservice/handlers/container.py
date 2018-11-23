@@ -179,3 +179,5 @@ class Data:
             return item.get("{}_id".format(field)).id, item.get("{}_id".format(field))
         elif isinstance(item.get("{}_id".format(field)), int):
             return item.get("{}_id".format(field)), None
+        else:
+            return item.get(field), item.get(field)
