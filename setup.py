@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="microservice",
-    version="0.3.12",
+    version="0.3.13",
     description="Powerful REST API microservice on Tornado",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",

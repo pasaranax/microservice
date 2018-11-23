@@ -162,3 +162,20 @@ class Data:
 
     def __str__(self):
         return "<{} {}>".format(self.__class__.__name__, self.data)
+
+    @staticmethod
+    def extract_field(item, field):
+        """
+        Extract tuple (id, object) from field if possible
+        :param item:
+        :param field: field name
+        :return: (id, object)
+        """
+        if isinstance(item.get(field), BasicObject):
+            return item.get(field).id, item.get(field)
+        elif isinstance(item.get(field), int):
+            return item.get(field), None
+        elif isinstance(item.get("{}_id".format(field)), BasicObject):
+            return item.get("{}_id".format(field)).id, item.get("{}_id".format(field))
+        elif isinstance(item.get("{}_id".format(field)), int):
+            return item.get("{}_id".format(field)), None
