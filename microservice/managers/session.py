@@ -39,6 +39,7 @@ class SessionManager(DataManager):
         session_obj.ip = ip
         session_obj.location = location
         session_obj.last_login = datetime.now()
+        session_obj.expire = datetime.now() + timedelta(days=cfg.app.session_lifetime)
         await self.obj.update(session_obj)
         session = session_obj.dict()
 
