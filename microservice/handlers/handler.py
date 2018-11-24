@@ -159,25 +159,25 @@ class BasicHandler(SentryMixinExt, RequestHandler):
                 await self.cache.store_request(self.request_hash(for_user=self.cache_method == "user"), self.cache_lifetime, "")
         self.init()
 
-    async def get(self, **kwargs):
+    async def get(self, me, *args, **kwargs):
         self.compose(error="#method_not_allowed", status=405, send=True)
 
-    async def post(self, **kwargs):
+    async def post(self, me, *args, **kwargs):
         self.compose(error="#method_not_allowed", status=405, send=True)
 
-    async def delete(self, **kwargs):
+    async def delete(self, me, *args, **kwargs):
         self.compose(error="#method_not_allowed", status=405, send=True)
 
-    async def patch(self, **kwargs):
+    async def patch(self, me, *args, **kwargs):
         self.compose(error="#method_not_allowed", status=405, send=True)
 
-    async def put(self, **kwargs):
+    async def put(self, me, *args, **kwargs):
         self.compose(error="#method_not_allowed", status=405, send=True)
 
-    def head(self, *args, **kwargs):
+    def head(self, me, *args, **kwargs):
         self.compose(error="#method_not_allowed", status=405, send=True)
 
-    def options(self, smth=None):
+    def options(self, *args, **kwargs):
         self.set_status(204)
         self.finish()
 
