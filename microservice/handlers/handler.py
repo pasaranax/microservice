@@ -9,7 +9,7 @@ from base64 import b64decode
 from concurrent.futures import ThreadPoolExecutor
 from json import JSONDecodeError
 from time import perf_counter as pc
-from urllib.parse import unquote
+from urllib.parse import unquote, parse_qs
 
 from raven.contrib.tornado import SentryMixin
 from telebot.apihelper import ApiException
@@ -312,6 +312,8 @@ class BasicHandler(SentryMixinExt, RequestHandler):
                         raise JSONDecodeError("Body must be dict or list", self.json_body, 0)
                 except (JSONDecodeError, UnicodeDecodeError) as e:
                     self.json_body = dict()
+                    for key, value in parse_qs(self.request.body.decode("utf-8")).items():
+                        self.json_body[key] = value[0] if len(value) > 0 else value
                     # raise ApiError("#json #parse {}".format(e))
         else:
             self.json_body = dict()
