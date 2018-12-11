@@ -55,3 +55,13 @@ class RedisCache:
 
     async def exists(self, key):
         return await self.redis.exists(key)
+
+    async def list(self, prefix):
+        keys = await self.redis.keys("{}*".format(prefix))
+        items = []
+        if keys:
+            items = [BasicObject.from_json(x) for x in await self.redis.mget(*keys)]
+        return items
+
+    async def delete(self, key):
+        await self.redis.delete(key)
