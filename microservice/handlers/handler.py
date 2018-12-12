@@ -93,7 +93,7 @@ class SentryMixinExt(SentryMixin):
 class BasicHandler(SentryMixinExt, RequestHandler):
     executor = ThreadPoolExecutor(max_workers=cfg.app.max_workers_on_executor)
     session_class = None
-    cache_method = "user"  # "all", None
+    cache_method = None  # "user", "all", None
     cache_lifetime = 10
     atomize = True  # every transaction creates atomic transaction in db
 
