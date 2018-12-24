@@ -44,9 +44,11 @@ class UserManager(DataManager):
             registration_date=datetime.now(),
             status="active",
         )
+        login = user_data["login"]
+        del user_data["login"]
         user_obj, created = await self.obj.get_or_create(
             self.model,
-            login=user_data["login"],
+            login=login,
             defaults=user_data
         )
         user = user_obj.object()
