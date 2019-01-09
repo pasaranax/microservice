@@ -31,9 +31,9 @@ class Server:
         try:
             import aioredis
             if hasattr(cfg.redis, "socket") and cfg.redis.socket:
-                self.app.redis_connection = self.loop.run_until_complete(aioredis.create_redis(cfg.redis.socket))
+                self.app.redis_connection = self.loop.run_until_complete(aioredis.create_redis_pool(cfg.redis.socket))
             else:
-                self.app.redis_connection = self.loop.run_until_complete(aioredis.create_redis((cfg.redis.host, cfg.redis.port)))
+                self.app.redis_connection = self.loop.run_until_complete(aioredis.create_redis_pool((cfg.redis.host, cfg.redis.port)))
         except (ImportError, OSError, AttributeError):
             self.app.redis_connection = None
 
