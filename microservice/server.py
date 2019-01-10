@@ -12,11 +12,10 @@ from microservice.routes import Router
 
 
 class Server:
-    def __init__(self, handlers, asyncio_debug=False):
+    def __init__(self, handlers):
         logging.info("Server starting...")
         AsyncIOMainLoop().install()
         self.loop = asyncio.get_event_loop()
-        self.loop.set_debug(asyncio_debug)
 
         self.router = Router(handlers)
         self.app = Application(self.router.routes, **cfg.app.tornado_settings)
