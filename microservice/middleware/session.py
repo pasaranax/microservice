@@ -140,6 +140,6 @@ class Session:
     async def update(self, push_token=None):
         token = self.request.headers.get(self.auth_header, None)
         ip = self.request.remote_ip
-        country = await location(ip)
-        session = await self.session_manager.update(token, ip, country, push_token)
+        # country = await location(ip)
+        session = await self.session_manager.update(token, ip, location=None, push_token=push_token)
         return session
