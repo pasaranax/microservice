@@ -37,6 +37,7 @@ class app:
     errors_email = "contact@example.com"
 
     sentry_url = os.getenv("SENTRY_URL")
+    sentry_client_kwargs = {}
     send_telegram_errors = True
     telegram_reporter = {
         "unknown": {  # hostname
