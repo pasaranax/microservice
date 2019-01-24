@@ -126,7 +126,7 @@ class UserManager(DataManager):
         else:
             user_obj.code = sha1(urandom(16)).hexdigest()
             await self.obj.update(user_obj)
-        return user_obj.code
+        return user_obj.object()
 
     async def confirm(self, code, password=None):
         """

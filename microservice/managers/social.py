@@ -21,6 +21,8 @@ class SocialManager(DataManager):
         return social
 
     async def read(self, network, social_id):
+        if not social_id:
+            return None
         try:
             res = await self.obj.get(Social, network=network, social_id=social_id)
         except DoesNotExist:
