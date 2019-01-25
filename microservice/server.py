@@ -27,7 +27,7 @@ class Server:
         else:
             self.app.objects = None
 
-        self.app.sentry_client = AsyncSentryClient(cfg.app.sentry_url)
+        self.app.sentry_client = AsyncSentryClient(cfg.app.sentry_url, **cfg.app.sentry_client_kwargs)
         try:
             import aioredis
             if hasattr(cfg.redis, "socket") and cfg.redis.socket:

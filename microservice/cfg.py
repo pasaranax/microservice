@@ -37,6 +37,7 @@ class app:
     errors_email = "contact@example.com"
 
     sentry_url = os.getenv("SENTRY_URL")
+    sentry_client_kwargs = {}
     send_telegram_errors = True
     telegram_reporter = {
         "unknown": {  # hostname
@@ -75,9 +76,3 @@ class app:
     number_of_nodes = 1
     max_workers_on_executor = 16
     ipstack_api_key = ""
-
-
-class Enum:
-    @classmethod
-    def all(cls):
-        return [cls.__dict__[x] for x in cls.__dict__.keys() if not x.startswith("_")]
