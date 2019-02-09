@@ -357,7 +357,10 @@ class BasicHandler(SentryMixinExt, RequestHandler):
                     except ApiException as e:
                         info["body"] = "Too big body (truncated)"
                         logging.warning("Can't send telegram report: {}".format(e))
-                        TelegramReporter.telegram_error(data["traceback"][-5:], info)
+                        try:
+                            TelegramReporter.telegram_error(data["traceback"][-5:], info)
+                        except ApiException:
+                            TelegramReporter.telegram_error(data["traceback"][-4:], info)
         if cfg.app.debug:
             self.finish(data)
         else:
