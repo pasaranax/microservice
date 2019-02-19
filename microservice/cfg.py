@@ -32,6 +32,9 @@ class app:
     smtp_password = "password"
     smtp_from = "Mailer <contact@example.com>"
 
+    # set to "aws" and configure cfg.aws.(email_key, email_secret, email_region_name) to use amazon SES
+    send_mail = "smtp"
+
     support_email = "contact@example.com"
     send_email_errors = False
     errors_email = "contact@example.com"
