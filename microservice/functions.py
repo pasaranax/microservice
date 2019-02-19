@@ -1,3 +1,4 @@
+import collections
 import itertools
 import logging
 import os
@@ -11,6 +12,13 @@ from time import perf_counter as pc
 import requests
 from asgiref.sync import sync_to_async
 from telebot import TeleBot
+
+try:
+    import boto3
+except ImportError:
+    boto3 = None
+
+from .exceptions import InternalError
 
 import cfg
 
@@ -75,7 +83,8 @@ class TelegramReporter:
         TelegramReporter.bot.send_photo(chat_id, link)
 
 
-def send_mail(to, text, subject, type="plain"):
+def send_mail_smtp(to, text, subject, type="plain"):
+    # send mail via smtp host
     smtp = SMTP_SSL(cfg.app.smtp_host, port=465)
     smtp.login(cfg.app.smtp_login, cfg.app.smtp_password)
 
@@ -84,8 +93,36 @@ def send_mail(to, text, subject, type="plain"):
     msg["From"] = cfg.app.smtp_from
     msg["To"] = to
 
-    smtp.sendmail(cfg.app.support_email, to, msg.as_string())
+    recpts = smtp.sendmail(cfg.app.support_email, to, msg.as_string())
     smtp.quit()
+
+    return len(recpts) > 0
+
+
+def send_mail_aws(to, text, subject, type="plain"):
+    # send mail via amazon ses
+    client = boto3.client('ses', region_name=cfg.aws.email_region_name, aws_access_key_id=cfg.aws.email_key,
+                          aws_secret_access_key=cfg.aws.email_secret)
+    if type == "plain":
+        message = {"Text": {"Charset": "utf-8", "Data": text}}
+    else:
+        message = {"Html": {"Charset": "utf-8", "Data": text}}
+    response = client.send_email(Destination={"ToAddresses": to if isinstance(to, (list, tuple)) else [to]},
+                                 Message={"Subject": {"Charset": "utf-8", "Data": subject}, "Body": message},
+                                 Source=cfg.app.smtp_from)
+
+    return 200 <= response.get("ResponseMetadata", {}).get("HTTPStatusCode", 500) <= 399
+
+
+send_mail = None
+if cfg.app.send_mail == "smtp":
+    send_mail = send_mail_smtp
+elif cfg.app.send_mail == "aws":
+    send_mail = send_mail_aws
+    if boto3 is None:
+        raise InternalError("Please, install boto3 to use Amazon SES")
+else:
+    raise NotImplementedError("Unknow send_mail method")
 
 
 def chunks(iterable, n):
