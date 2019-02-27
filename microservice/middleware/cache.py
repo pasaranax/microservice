@@ -13,7 +13,7 @@ class RedisCache:
 
     async def restore_answer(self, request_hash):
         data = await self.redis.get("request.{}".format(request_hash))
-        answer = json.loads(data)
+        answer = json.loads(data or json.dumps(data))
         return answer
 
     async def check_request(self, request_hash):
@@ -31,8 +31,8 @@ class RedisCache:
     async def store(self, key, expire=0, o=None):
         """
         Store BasicObject to redis (jsoned)
-        :param key: 
-        :param expire: 
+        :param key:
+        :param expire:
         :param o: BasicObject
         :return: None
         """
