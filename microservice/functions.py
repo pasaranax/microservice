@@ -21,6 +21,13 @@ from .exceptions import InternalError
 
 import cfg
 
+try:
+    from raven import Client
+    sentry = Client(cfg.app.sentry_url, **cfg.app.sentry_client_kwargs)
+except ImportError:
+    Client = None
+    sentry = None
+
 
 class TelegramReporter:
     last_error = None
@@ -95,6 +102,12 @@ def send_mail_smtp(to, text, subject, type="plain"):
     recpts = smtp.sendmail(cfg.app.support_email, to, msg.as_string())
     smtp.quit()
 
+    if sentry:
+        for addr in to:
+            sentry.captureMessage("email is sent",
+                                  level=logging.INFO if addr in recpts else logging.WARNING,
+                                  extra={"tags": {addr: addr}})
+
     return len(recpts) > 0
 
 
@@ -106,11 +119,19 @@ def send_mail_aws(to, text, subject, type="plain"):
         message = {"Text": {"Charset": "utf-8", "Data": text}}
     else:
         message = {"Html": {"Charset": "utf-8", "Data": text}}
-    response = client.send_email(Destination={"ToAddresses": to if isinstance(to, (list, tuple)) else [to]},
+    _to = to if isinstance(to, (list, tuple)) else [to]
+    response = client.send_email(Destination={"ToAddresses": _to},
                                  Message={"Subject": {"Charset": "utf-8", "Data": subject}, "Body": message},
                                  Source=cfg.app.smtp_from)
+    response_level_ok = 200 <= response.get("ResponseMetadata", {}).get("HTTPStatusCode", 500) < 400
 
-    return 200 <= response.get("ResponseMetadata", {}).get("HTTPStatusCode", 500) <= 399
+    if sentry:
+        for addr in _to:
+            sentry.captureMessage("email is sent",
+                                  level=logging.INFO if response_level_ok else logging.WARNING,
+                                  extra={"tags": {addr: addr}, "response": response})
+
+    return response_level_ok
 
 
 send_mail = None
