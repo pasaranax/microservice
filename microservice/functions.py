@@ -21,13 +21,6 @@ from .exceptions import InternalError
 
 import cfg
 
-try:
-    from raven import Client
-    sentry = Client(cfg.app.sentry_url, **cfg.app.sentry_client_kwargs)
-except ImportError:
-    Client = None
-    sentry = None
-
 
 class TelegramReporter:
     last_error = None
