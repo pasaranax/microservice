@@ -21,13 +21,6 @@ from .exceptions import InternalError
 
 import cfg
 
-try:
-    from raven import Client
-    sentry = Client(cfg.app.sentry_url, **cfg.app.sentry_client_kwargs)
-except ImportError:
-    Client = None
-    sentry = None
-
 
 class TelegramReporter:
     last_error = None
@@ -89,7 +82,7 @@ class TelegramReporter:
         TelegramReporter.bot.send_photo(chat_id, link)
 
 
-def send_mail_smtp(to, text, subject, type="plain"):
+def send_mail_smtp(to, text, subject, type="plain", sentry=None):
     # send mail via smtp host
     smtp = SMTP_SSL(cfg.app.smtp_host, port=465)
     smtp.login(cfg.app.smtp_login, cfg.app.smtp_password)
@@ -111,7 +104,7 @@ def send_mail_smtp(to, text, subject, type="plain"):
     return len(recpts) > 0
 
 
-def send_mail_aws(to, text, subject, type="plain"):
+def send_mail_aws(to, text, subject, type="plain", sentry=None):
     # send mail via amazon ses
     client = boto3.client('ses', region_name=cfg.aws.email_region_name, aws_access_key_id=cfg.aws.email_key,
                           aws_secret_access_key=cfg.aws.email_secret)
