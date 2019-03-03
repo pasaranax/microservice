@@ -99,7 +99,7 @@ def send_mail_smtp(to, text, subject, type="plain", sentry=None):
         for addr in to:
             sentry.captureMessage("email is sent",
                                   level=logging.INFO if addr in recpts else logging.WARNING,
-                                  extra={"tags": {addr: addr}})
+                                  extra={"tags": {addr.replace("@", "(at)"): addr}})
 
     return len(recpts) > 0
 
@@ -122,7 +122,7 @@ def send_mail_aws(to, text, subject, type="plain", sentry=None):
         for addr in _to:
             sentry.captureMessage("email is sent",
                                   level=logging.INFO if response_level_ok else logging.WARNING,
-                                  extra={"tags": {addr: addr}, "response": response})
+                                  extra={"tags": {addr.replace("@", "(at)"): addr}, "response": response})
 
     return response_level_ok
 
