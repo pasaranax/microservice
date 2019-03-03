@@ -99,7 +99,7 @@ def send_mail_smtp(to, text, subject, type="plain", sentry=None):
         for addr in to:
             sentry.captureMessage("email is sent",
                                   level=logging.INFO if addr in recpts else logging.WARNING,
-                                  tags={addr: addr})
+                                  tags={"email": addr})
 
     return len(recpts) > 0
 
@@ -122,7 +122,7 @@ def send_mail_aws(to, text, subject, type="plain", sentry=None):
         for addr in _to:
             sentry.captureMessage("email is sent",
                                   level=logging.INFO if response_level_ok else logging.WARNING,
-                                  extra={"response": response}, tags={addr: addr})
+                                  extra={"response": response}, tags={"email": addr})
 
     return response_level_ok
 
