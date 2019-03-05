@@ -173,7 +173,10 @@ def chunks(iterable, n):
 
 
 async def location(ip):
-    country = requests.request("GET", "http://api.ipstack.com/{}?access_key={}".format(ip, cfg.app.ipstack_api_key)).json()
+    if cfg.app.ipstack_api_key:
+        country = requests.request("GET", "http://api.ipstack.com/{}?access_key={}".format(ip, cfg.app.ipstack_api_key)).json()
+    else:
+        country = {}
     return country
 
 
