@@ -112,7 +112,7 @@ class Session:
     async def force_login(self, user, network=None, push_token=None):
         user_agent = self.request.headers.get("User-Agent", "")
         ip = self.request.remote_ip
-        country = {}  # await location(ip)
+        country = await location(ip)
         session_result = await self.session_manager.create(user, user_agent, network, push_token, ip=ip, location=country)
         user["token"] = session_result["token"]
         return user
