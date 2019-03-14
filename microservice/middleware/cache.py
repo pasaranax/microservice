@@ -40,7 +40,10 @@ class RedisCache:
             data = o.json()
         else:
             data = None
-        await self.redis.setex(key, expire, data)
+        if expire:
+            await self.redis.setex(key, expire, data)
+        else:
+            await self.redis.set(key, data)
 
     async def restore(self, key, object_class=BasicObject):
         """
@@ -50,7 +53,10 @@ class RedisCache:
         :return: BascicObject
         """
         value = await self.redis.get(key)
-        o = object_class.from_json(value)
+        if value:
+            o = BasicObject.from_json(value)
+        else:
+            o = None
         return o
 
     async def exists(self, key):
