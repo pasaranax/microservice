@@ -10,25 +10,25 @@ class DataManager:
     model = None
 
     def __init__(self, obj=None):
-        """        
+        """
         Создать менеджер данных
         """
         self.cache = {}
         if obj is not None:
             self.obj = obj
-    
+
     def create(self, **kwargs):
         return None
-    
+
     def read(self, **kwargs):
         return None
-    
+
     def update(self, **kwargs):
         return None
-    
+
     def delete(self, **kwargs):
         return None
-    
+
     def list(self, **kwargs):
         return None
 
@@ -52,7 +52,8 @@ class DataManager:
             return False
 
     def __del__(self):
-        self.cache = {k: v for k, v in self.cache.items() if v[0] > datetime.now()}
+        if hasattr(self.cache, "items"):
+            self.cache = {k: v for k, v in self.cache.items() if v[0] > datetime.now()}
 
     @staticmethod
     def extract_results(results, *args, **kwargs):
