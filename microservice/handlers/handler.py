@@ -21,7 +21,7 @@ from tornado.netutil import is_valid_ip
 from tornado.web import RequestHandler
 
 import cfg
-from microservice.exceptions import ApiError
+from microservice.exceptions import ApiError, InternalError
 from microservice.functions import TelegramReporter
 from microservice.metrics import Metrics
 from microservice.middleware.session import Session
@@ -395,6 +395,8 @@ class BasicHandler(SentryMixinExt, RequestHandler):
 
     async def lock(self, key, max_time=10):
         """create lock flag"""
+        if not key:
+            raise InternalError("#error lock without key")
         if isinstance(key, BaseUser):
             key = "user-{}".format(key.id)
         self.lock_id = str(uuid4())
@@ -404,7 +406,7 @@ class BasicHandler(SentryMixinExt, RequestHandler):
         """delete lock flag"""
         if isinstance(key, BaseUser):
             key = "user-{}".format(key.id)
-        if await self.cache.exists(key) and await self.cache.get(key) == self.lock_id:
+        if key and await self.cache.exists(key) and await self.cache.get(key) == self.lock_id:
             await self.cache.delete(key)
             print("unlocked", key, self.lock_id)
 
@@ -413,7 +415,7 @@ class BasicHandler(SentryMixinExt, RequestHandler):
         if isinstance(key, BaseUser):
             key = "user-{}".format(key.id)
         while True:
-            if await self.cache.exists(key):
+            if key and await self.cache.exists(key):
                 await asyncio.sleep(period)
             else:
                 break
