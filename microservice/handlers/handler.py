@@ -408,7 +408,6 @@ class BasicHandler(SentryMixinExt, RequestHandler):
             key = "user-{}".format(key.id)
         if key and await self.cache.exists(key) and await self.cache.get(key) == self.lock_id:
             await self.cache.delete(key)
-            print("unlocked", key, self.lock_id)
 
     async def wait(self, key, period=1):
         """wait while key exists"""
