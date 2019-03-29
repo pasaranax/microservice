@@ -1,3 +1,4 @@
+import asyncio
 import binascii
 import gzip
 import json
@@ -10,7 +11,9 @@ from concurrent.futures import ThreadPoolExecutor
 from json import JSONDecodeError
 from time import perf_counter as pc
 from urllib.parse import unquote, parse_qs
+from uuid import uuid4
 
+from microservice.middleware.user import BaseUser
 from raven.contrib.tornado import SentryMixin
 from telebot.apihelper import ApiException
 from tornado.escape import json_decode
@@ -18,7 +21,7 @@ from tornado.netutil import is_valid_ip
 from tornado.web import RequestHandler
 
 import cfg
-from microservice.exceptions import ApiError
+from microservice.exceptions import ApiError, InternalError
 from microservice.functions import TelegramReporter
 from microservice.metrics import Metrics
 from microservice.middleware.session import Session
@@ -117,6 +120,7 @@ class BasicHandler(SentryMixinExt, RequestHandler):
         self.queue = []
         self.version = self.version if hasattr(self, "version") else 0
         self.finished = False
+        self.lock_id = None
 
     def init(self):
         """Redefine this method instead of self.initialize()"""
@@ -388,3 +392,29 @@ class BasicHandler(SentryMixinExt, RequestHandler):
         )
         hash = sha1(s.encode("utf-8"))
         return hash.hexdigest()
+
+    async def lock(self, key, max_time=10):
+        """create lock flag"""
+        if not key:
+            raise InternalError("#error lock without key")
+        if isinstance(key, BaseUser):
+            key = "user-{}".format(key.id)
+        self.lock_id = str(uuid4())
+        await self.cache.set(key, expire=max_time, value=self.lock_id)
+
+    async def unlock(self, key):
+        """delete lock flag"""
+        if isinstance(key, BaseUser):
+            key = "user-{}".format(key.id)
+        if key and await self.cache.exists(key) and await self.cache.get(key) == self.lock_id:
+            await self.cache.delete(key)
+
+    async def wait(self, key, period=1):
+        """wait while key exists"""
+        if isinstance(key, BaseUser):
+            key = "user-{}".format(key.id)
+        while True:
+            if key and await self.cache.exists(key):
+                await asyncio.sleep(period)
+            else:
+                break

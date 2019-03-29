@@ -20,12 +20,17 @@ class RedisCache:
         return await self.redis.exists("request.{}".format(request_hash))
 
     async def set(self, key, expire=0, value=None):
+        """set value as json"""
         data = json.dumps(value)
         await self.redis.setex(key, expire, data)
 
     async def get(self, key):
+        """restore value as json"""
         data = await self.redis.get(key)
-        value = json.loads(data)
+        if data is not None:
+            value = json.loads(data)
+        else:
+            value = None
         return value
 
     async def store(self, key, expire=0, o=None):
