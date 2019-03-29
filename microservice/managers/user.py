@@ -82,7 +82,7 @@ class UserManager(DataManager):
             select u.*, row_to_json(s.*) "session"
             from "user" u
             LEFT JOIN "session" s ON u.id = s.user_id
-            where (token = %s and (s.expire > NOW() OR s.expire IS NULL)) OR u.id = %s OR u.login = %s OR u.email = %s
+            where (token = %s) OR u.id = %s OR u.login = %s OR u.email = %s
         """, token, user_id, login, email))
         me = self.extract_one(me_obj, extra_attrs=["session"])
         return me
