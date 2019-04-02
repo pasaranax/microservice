@@ -1,7 +1,8 @@
 ## Powerful REST API *microservice* on Tornado
 
 ### Main goal
-Sometimes (actually constantly) we need to deploy microservices like messenger bots (telegram, facebook), small backends, webhooks and other. 
+Sometimes we need to deploy microservices like messenger bots (telegram, facebook), small backends, webhooks and other.
+This package contains all you need to setup simple endpoint in minutes with authorization, caching, and improved security.
 
 ### Features
 - tornado with improved basic handler for easy create REST endpoints

@@ -1,5 +1,7 @@
 import logging
 
+from asgiref.sync import sync_to_async
+
 from microservice.middleware.objects import BasicObject
 
 
@@ -30,11 +32,13 @@ class BaseUser(BasicObject):
     async def check_self(self, handler):
         return True
 
+    @sync_to_async
     def capture_message(self, message, extra=None, level=logging.WARNING):
         if hasattr(self, "sentry_client"):
             self.sentry_client.user_context(dict(self))
             self.sentry_client.captureMessage(message, extra=extra, level=level)
 
+    @sync_to_async
     def capture_exception(self, extra=None):
         if hasattr(self, "sentry_client"):
             self.sentry_client.user_context(dict(self))
