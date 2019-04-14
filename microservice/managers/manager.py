@@ -1,4 +1,5 @@
 from datetime import timedelta, datetime
+from itertools import islice
 
 from microservice.middleware.objects import BasicObject, Collection
 
@@ -63,7 +64,7 @@ class DataManager:
         :param results: ответ эластика или пиви
         :return: list
         """
-        if len(results) > 0:
+        if len(list(islice(results, 0))) > 0:
             lst = Collection([x.dict(*args, **kwargs) for x in results], BasicObject)
         else:
             lst = Collection([], BasicObject)
