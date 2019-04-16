@@ -1,4 +1,5 @@
 from datetime import timedelta, datetime
+from itertools import islice
 
 from microservice.middleware.objects import BasicObject, Collection
 
@@ -64,6 +65,20 @@ class DataManager:
         :return: list
         """
         if len(results) > 0:
+            lst = Collection([x.dict(*args, **kwargs) for x in results], BasicObject)
+        else:
+            lst = Collection([], BasicObject)
+        return lst
+
+    @staticmethod
+    def extract_results_gen(results, *args, **kwargs):
+        """
+        Извлечь список из результатов пиви или эластика, don't calc iterable `results`
+        :param extra_attrs: аттрибуты из результата, которые надо включить в словарь (peewee)
+        :param results: ответ эластика или пиви
+        :return: list
+        """
+        if len(list(islice(results, 0, 1))) > 0:
             lst = Collection([x.dict(*args, **kwargs) for x in results], BasicObject)
         else:
             lst = Collection([], BasicObject)
