@@ -64,7 +64,7 @@ class DataManager:
         :param results: ответ эластика или пиви
         :return: list
         """
-        if len(list(islice(results, 0))) > 0:
+        if len(list(islice(results, 0, 1))) > 0:
             lst = Collection([x.dict(*args, **kwargs) for x in results], BasicObject)
         else:
             lst = Collection([], BasicObject)
