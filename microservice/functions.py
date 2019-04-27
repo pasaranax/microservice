@@ -141,6 +141,11 @@ else:
     raise NotImplementedError("Unknow send_mail method")
 
 
+@sync_to_async
+def send_mail_async(*args, **kwargs):
+    return send_mail(*args, **kwargs)
+
+
 def chunks(iterable, n):
     """
     Разделить итератор на куски по n элементов
