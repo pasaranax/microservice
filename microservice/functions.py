@@ -5,7 +5,7 @@ import platform
 import socket
 from email.mime.text import MIMEText
 from hashlib import md5
-from smtplib import SMTP_SSL
+from smtplib import SMTP_SSL, SMTP
 from time import perf_counter as pc
 
 import requests
@@ -84,8 +84,11 @@ class TelegramReporter:
 
 def send_mail_smtp(to, text, subject, type="plain", sentry=None):
     # send mail via smtp host
-    smtp = SMTP_SSL(cfg.app.smtp_host, port=cfg.app.smtp_port)
-    smtp.login(cfg.app.smtp_login, cfg.app.smtp_password)
+    if cfg.app.smtp_login and cfg.app.smtp_password:
+        smtp = SMTP_SSL(cfg.app.smtp_host, port=cfg.app.smtp_port)
+        smtp.login(cfg.app.smtp_login, cfg.app.smtp_password)
+    else:
+        smtp = SMTP(cfg.app.smtp_host, port=cfg.app.smtp_port)
 
     msg = MIMEText(text or "", _subtype=type)
     msg["Subject"] = subject
