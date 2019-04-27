@@ -84,7 +84,7 @@ class TelegramReporter:
 
 def send_mail_smtp(to, text, subject, type="plain", sentry=None):
     # send mail via smtp host
-    smtp = SMTP_SSL(cfg.app.smtp_host, port=465)
+    smtp = SMTP_SSL(cfg.app.smtp_host, port=cfg.app.smtp_port)
     smtp.login(cfg.app.smtp_login, cfg.app.smtp_password)
 
     msg = MIMEText(text or "", _subtype=type)
