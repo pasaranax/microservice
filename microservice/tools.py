@@ -24,9 +24,6 @@ def migrate():
           time timestamp
         );
         
-        alter table migrations
-          owner to ege;
-        
         create unique index if not exists migrations_id_uindex
           on migrations (id);
     """)
