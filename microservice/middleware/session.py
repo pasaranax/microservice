@@ -36,6 +36,8 @@ def check(anonymous=True, roles=None):
                     async with check_atomic(self.application.objects, self.atomize):
                         try:
                             me = await self.session.me()
+                            await self.wait(me)
+                            me = await self.session.me()  # user could be edited while waiting
                             if not (me or anonymous):
                                 raise AccessDenied("#auth #token Token invalid")
                             elif roles and me["role"] not in roles:

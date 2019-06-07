@@ -413,8 +413,5 @@ class BasicHandler(SentryMixinExt, RequestHandler):
         """wait while key exists"""
         if isinstance(key, BaseUser):
             key = "user-{}".format(key.id)
-        while True:
-            if key and await self.cache.exists(key):
-                await asyncio.sleep(period)
-            else:
-                break
+        while key and await self.cache.exists(key):
+            await asyncio.sleep(period)
